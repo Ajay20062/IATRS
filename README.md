@@ -13,7 +13,7 @@ A comprehensive Applicant Tracking System (ATS) built with Flask, MySQL, and mod
 
 1. **Clone/Download the project**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Ajay20062/DBMS-IATRS/
    cd DBMS-IATRS
    ```
 
