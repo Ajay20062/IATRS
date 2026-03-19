@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Schema & Data Viewer - ATS System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .table-card {
+            transition: all 0.3s ease;
+        }
+        .table-card:hover {
+            transform: translateY(-5px);
+        }
+        .relationship-line {
+            stroke: #3b82f6;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        .data-table {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <h1 class="text-4xl font-bold text-gray-800">📊 Database Schema & Data Viewer</h1>
+            <p class="text-gray-600 mt-2">Intelligent ATS System - Real-time Database Structure & Data</p>
+            <div class="mt-4 flex gap-4">
+                <a href="index.html" class="text-blue-600 hover:underline">← Candidate Portal</a>
+                <a href="dashboard.html" class="text-blue-600 hover:underline">Recruiter Dashboard</a>
+                <a href="api-status.html" class="text-blue-600 hover:underline">API Status</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Database Stats Overview -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Database Overview</h2>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                    <div class="text-3xl font-bold text-blue-600" id="totalTables">5</div>
+                    <div class="text-gray-600">Total Tables</div>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                    <div class="text-3xl font-bold text-green-600" id="totalRecords">0</div>
+                    <div class="text-gray-600">Total Records</div>
+                </div>
+                <div class="bg-purple-50 p-6 rounded-lg border border-purple-200">
+                    <div class="text-3xl font-bold text-purple-600" id="recruitersCount">0</div>
+                    <div class="text-gray-600">Recruiters</div>
+                </div>
+                <div class="bg-orange-50 p-6 rounded-lg border border-orange-200">
+                    <div class="text-3xl font-bold text-orange-600" id="candidatesCount">0</div>
+                    <div class="text-gray-600">Candidates</div>
+                </div>
+                <div class="bg-red-50 p-6 rounded-lg border border-red-200">
+                    <div class="text-3xl font-bold text-red-600" id="applicationsCount">0</div>
+                    <div class="text-gray-600">Applications</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">Jobs by Status</h3>
+                    <canvas id="jobsChart" width="400" height="200"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">Applications by Status</h3>
+                    <canvas id="applicationsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Data Section -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Table Data</h2>
+                <div class="flex gap-4">
+                    <select id="tableSelector" onchange="loadTableData()" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Table</option>
+                        <option value="recruiters">Recruiters</option>
+                        <option value="jobs">Jobs</option>
+                        <option value="candidates">Candidates</option>
+                        <option value="applications">Applications</option>
+                        <option value="interviews">Interviews</option>
+                    </select>
+                    <button onclick="refreshCurrentTable()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="tableLoading" class="hidden text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600">Loading table data...</p>
+            </div>
+
+            <!-- Table Content -->
+            <div id="tableContent" class="hidden">
+                <div class="mb-4 flex justify-between items-center">
+                    <div class="text-sm text-gray-600">
+                        Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> records
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="previousPage()" id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 rounded transition-colors" disabled>
+                            ← Previous
+                        </button>
+                        <button onclick="nextPage()" id="nextBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 rounded transition-colors" disabled>
+                            Next →
+                        </button>
+                    </div>
+                </div>
+                <div class="data-table border border-gray-200 rounded-lg overflow-hidden">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr id="tableHeader">
+                                <!-- Headers will be dynamically inserted -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be dynamically inserted -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-8">
+                <div class="text-gray-400 text-6xl mb-4">📋</div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No Table Selected</h3>
+                <p class="text-gray-500">Select a table from the dropdown to view its data</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden text-center py-8">
+                <div class="text-red-400 text-6xl mb-4">⚠️</div>
+                <h3 class="text-xl font-semibold text-red-700 mb-2">Error Loading Data</h3>
+                <p class="text-gray-500">Please make sure the backend server is running</p>
+            </div>
+        </div>
+
+        <!-- Database Schema Visual -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Database Schema</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Recruiters Table -->
+                <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-blue-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">👥 Recruiters</h3>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold" id="recruitersTableCount">0</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500 mr-2">🔑</span>
+                            <code class="text-purple-600">recruiter_id</code>
+                            <span class="text-gray-500 ml-2">INT PK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📝</span>
+                            <code>full_name</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📧</span>
+                            <code>email</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🏢</span>
+                            <code>company</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">⏰</span>
+                            <code>created_at</code>
+                            <span class="text-gray-500 ml-2">TIMESTAMP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jobs Table -->
+                <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-green-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">💼 Jobs</h3>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold" id="jobsTableCount">0</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500 mr-2">🔑</span>
+                            <code class="text-purple-600">job_id</code>
+                            <span class="text-gray-500 ml-2">INT PK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🔗</span>
+                            <code>recruiter_id</code>
+                            <span class="text-gray-500 ml-2">INT FK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📝</span>
+                            <code>title</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(200)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🏢</span>
+                            <code>department</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📍</span>
+                            <code>location</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(200)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🏷️</span>
+                            <code>status</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(50)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Candidates Table -->
+                <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-orange-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">👤 Candidates</h3>
+                        <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold" id="candidatesTableCount">0</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500 mr-2">🔑</span>
+                            <code class="text-purple-600">candidate_id</code>
+                            <span class="text-gray-500 ml-2">INT PK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📝</span>
+                            <code>full_name</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📧</span>
+                            <code>email</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📱</span>
+                            <code>phone</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(20)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📄</span>
+                            <code>resume_url</code>
+                            <span class="text-gray-500 ml-2">TEXT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Table -->
+                <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-red-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">📄 Applications</h3>
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold" id="applicationsTableCount">0</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500 mr-2">🔑</span>
+                            <code class="text-purple-600">application_id</code>
+                            <span class="text-gray-500 ml-2">INT PK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🔗</span>
+                            <code>job_id</code>
+                            <span class="text-gray-500 ml-2">INT FK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🔗</span>
+                            <code>candidate_id</code>
+                            <span class="text-gray-500 ml-2">INT FK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🏷️</span>
+                            <code>status</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(50)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interviews Table -->
+                <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-purple-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">📅 Interviews</h3>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold" id="interviewsTableCount">0</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500 mr-2">🔑</span>
+                            <code class="text-purple-600">interview_id</code>
+                            <span class="text-gray-500 ml-2">INT PK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🔗</span>
+                            <code>application_id</code>
+                            <span class="text-gray-500 ml-2">INT FK</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">📅</span>
+                            <code>scheduled_at</code>
+                            <span class="text-gray-500 ml-2">DATETIME</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🎯</span>
+                            <code>interview_type</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(50)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2">🏷️</span>
+                            <code>status</code>
+                            <span class="text-gray-500 ml-2">VARCHAR(50)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = window.location.protocol.startsWith('http')
+            ? window.location.origin
+            : 'http://127.0.0.1:5000';
+        let currentTable = '';
+        let currentPage = 0;
+        let pageSize = 10;
+        let totalRecords = 0;
+        let jobsChart = null;
+        let applicationsChart = null;
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDatabaseStats();
+            initializeCharts();
+        });
+
+        // Load database statistics
+        async function loadDatabaseStats() {
+            try {
+                const response = await fetch(`${API_URL}/database/stats`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch database stats');
+                }
+
+                const stats = await response.json();
+                
+                // Update overview cards
+                document.getElementById('recruitersCount').textContent = stats.recruiters || 0;
+                document.getElementById('candidatesCount').textContent = stats.candidates || 0;
+                document.getElementById('applicationsCount').textContent = stats.applications?.total || 0;
+                
+                // Update table counts
+                document.getElementById('recruitersTableCount').textContent = stats.recruiters || 0;
+                document.getElementById('jobsTableCount').textContent = stats.jobs?.total || 0;
+                document.getElementById('candidatesTableCount').textContent = stats.candidates || 0;
+                document.getElementById('applicationsTableCount').textContent = stats.applications?.total || 0;
+                document.getElementById('interviewsTableCount').textContent = stats.interviews || 0;
+                
+                // Calculate total records
+                const total = (stats.recruiters || 0) + (stats.jobs?.total || 0) + 
+                              (stats.candidates || 0) + (stats.applications?.total || 0) + (stats.interviews || 0);
+                document.getElementById('totalRecords').textContent = total;
+                
+                // Update charts
+                updateCharts(stats);
+                
+            } catch (error) {
+                console.error('Error loading database stats:', error);
+                showErrorState();
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            const jobsCtx = document.getElementById('jobsChart').getContext('2d');
+            const appsCtx = document.getElementById('applicationsChart').getContext('2d');
+            
+            jobsChart = new Chart(jobsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open', 'Paused', 'Closed'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            applicationsChart = new Chart(appsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Applied', 'Screening', 'Interviewing', 'Hired', 'Rejected'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#8b5cf6', '#10b981', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Update charts with data
+        function updateCharts(stats) {
+            // Update jobs chart
+            if (stats.jobs_by_status) {
+                jobsChart.data.datasets[0].data = [
+                    stats.jobs_by_status['Open'] || 0,
+                    stats.jobs_by_status['Paused'] || 0,
+                    stats.jobs_by_status['Closed'] || 0
+                ];
+                jobsChart.update();
+            }
+            
+            // Update applications chart
+            if (stats.applications_by_status) {
+                applicationsChart.data.datasets[0].data = [
+                    stats.applications_by_status['Applied'] || 0,
+                    stats.applications_by_status['Screening'] || 0,
+                    stats.applications_by_status['Interviewing'] || 0,
+                    stats.applications_by_status['Hired'] || 0,
+                    stats.applications_by_status['Rejected'] || 0
+                ];
+                applicationsChart.update();
+            }
+        }
+
+        // Load table data
+        async function loadTableData() {
+            const tableSelector = document.getElementById('tableSelector');
+            const selectedTable = tableSelector.value;
+            if (selectedTable !== currentTable) {
+                currentPage = 0;
+            }
+            currentTable = selectedTable;
+            
+            if (!currentTable) {
+                showEmptyState();
+                return;
+            }
+            
+            showLoadingState();
+            
+            try {
+                const response = await fetch(`${API_URL}/database/tables?table=${currentTable}&limit=${pageSize}&offset=${currentPage * pageSize}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch table data');
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                displayTableData(result);
+                
+            } catch (error) {
+                console.error('Error loading table data:', error);
+                showErrorState();
+            }
+        }
+
+        // Display table data
+        function displayTableData(result) {
+            const tableContent = document.getElementById('tableContent');
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            // Clear existing content
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            if (!result.data || result.data.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            // Create headers
+            const headers = Object.keys(result.data[0]);
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                th.textContent = formatHeader(header);
+                tableHeader.appendChild(th);
+            });
+            
+            // Create rows
+            result.data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+                    const formatted = formatCellValue(row[header], header);
+                    if (formatted.isHtml) {
+                        td.innerHTML = formatted.value;
+                    } else {
+                        td.textContent = formatted.value;
+                    }
+                    tr.appendChild(td);
+                });
+                
+                tableBody.appendChild(tr);
+            });
+            
+            // Update pagination info
+            totalRecords = result.total;
+            document.getElementById('showingCount').textContent = Math.min(result.data.length, result.total);
+            document.getElementById('totalCount').textContent = result.total;
+            
+            // Update pagination buttons
+            updatePaginationButtons(result.has_more);
+            
+            // Show table content
+            showTableContent();
+        }
+
+        // Format header names
+        function formatHeader(header) {
+            return header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Format cell values
+        function formatCellValue(value, header) {
+            if (value === null || value === undefined) {
+                return { value: '-', isHtml: false };
+            }
+            
+            // Format dates
+            if (header.endsWith('_at') || header.endsWith('_date')) {
+                return { value: new Date(value).toLocaleString(), isHtml: false };
+            }
+            
+            // Format status
+            if (header === 'status') {
+                const colors = {
+                    'Open': 'bg-green-100 text-green-800',
+                    'Closed': 'bg-red-100 text-red-800',
+                    'Paused': 'bg-yellow-100 text-yellow-800',
+                    'Applied': 'bg-blue-100 text-blue-800',
+                    'Screening': 'bg-purple-100 text-purple-800',
+                    'Interviewing': 'bg-indigo-100 text-indigo-800',
+                    'Hired': 'bg-emerald-100 text-emerald-800',
+                    'Rejected': 'bg-red-100 text-red-800'
+                };
+                const colorClass = colors[value] || 'bg-gray-100 text-gray-800';
+                return {
+                    value: `<span class="status-badge ${colorClass}">${value}</span>`,
+                    isHtml: true
+                };
+            }
+            
+            return { value: String(value), isHtml: false };
+        }
+
+        // Pagination functions
+        function nextPage() {
+            currentPage++;
+            loadTableData();
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadTableData();
+            }
+        }
+
+        function updatePaginationButtons(hasMore) {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = !hasMore;
+            
+            if (prevBtn.disabled) {
+                prevBtn.className = 'bg-gray-100 text-gray-400 px-3 py-1 rounded cursor-not-allowed';
+            } else {
+                prevBtn.className = 'bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 rounded transition-colors';
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.className = 'bg-gray-100 text-gray-400 px-3 py-1 rounded cursor-not-allowed';
+            } else {
+                nextBtn.className = 'bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 rounded transition-colors';
+            }
+        }
+
+        // Refresh current table
+        function refreshCurrentTable() {
+            if (currentTable) {
+                currentPage = 0;
+                loadTableData();
+            }
+        }
+
+        // State management functions
+        function showLoadingState() {
+            document.getElementById('tableLoading').classList.remove('hidden');
+            document.getElementById('tableContent').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+        }
+
+        function showTableContent() {
+            document.getElementById('tableLoading').classList.add('hidden');
+            document.getElementById('tableContent').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+        }
+
+        function showEmptyState() {
+            document.getElementById('tableLoading').classList.add('hidden');
+            document.getElementById('tableContent').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+        }
+
+        function showErrorState() {
+            document.getElementById('tableLoading').classList.add('hidden');
+            document.getElementById('tableContent').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
