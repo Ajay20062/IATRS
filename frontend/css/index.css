@@ -1,0 +1,10 @@
+body {
+  background: linear-gradient(135deg, #e8f3ff, #f9fcff);
+  min-height: 100vh;
+}
+
+.hero {
+  max-width: 900px;
+  margin: 72px auto;
+}
+

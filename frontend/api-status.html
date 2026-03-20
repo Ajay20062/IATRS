@@ -5,22 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Status - ATS System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .pulse-dot {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-    </style>
+    <link rel="stylesheet" href="./css/api-status.css">
 </head>
 <body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen text-white">
     <!-- Header -->
     <header class="bg-gray-800 shadow-lg border-b border-gray-700">
         <div class="container mx-auto px-6 py-6">
-            <h1 class="text-4xl font-bold">⚡ Flask API Status Dashboard</h1>
-            <p class="text-gray-400 mt-2">Real-time monitoring of ATS Backend Services</p>
+            <h1 class="text-4xl font-bold">ATS API Status Dashboard</h1>
+            <p class="text-gray-400 mt-2">Real-time monitoring of FastAPI backend services</p>
             <div class="mt-4 flex gap-4">
                 <a href="index.html" class="text-blue-400 hover:underline">← Candidate Portal</a>
                 <a href="dashboard.html" class="text-blue-400 hover:underline">Recruiter Dashboard</a>
@@ -44,13 +36,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-gray-700 rounded-lg p-6">
                     <div class="text-gray-400 text-sm mb-2">Backend Framework</div>
-                    <div class="text-2xl font-bold">Flask</div>
+                    <div class="text-2xl font-bold">FastAPI</div>
                     <div class="text-sm text-gray-500 mt-1">Python Web Framework</div>
                 </div>
                 <div class="bg-gray-700 rounded-lg p-6">
                     <div class="text-gray-400 text-sm mb-2">Server Port</div>
-                    <div class="text-2xl font-bold">5000</div>
-                    <div class="text-sm text-gray-500 mt-1">localhost:5000</div>
+                    <div class="text-2xl font-bold">8000</div>
+                    <div class="text-sm text-gray-500 mt-1">localhost:8000</div>
                 </div>
                 <div class="bg-gray-700 rounded-lg p-6">
                     <div class="text-gray-400 text-sm mb-2">Mode</div>
@@ -87,7 +79,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">Database:</span>
-                            <span class="font-mono">ats_db</span>
+                            <span class="font-mono">iatrs</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">Tables:</span>
@@ -139,29 +131,57 @@
     </main>
 
     <script>
-        const API_URL =
-            window.location.protocol === 'file:'
-                ? 'http://127.0.0.1:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`;
+        const CANDIDATE_API_BASES = (() => {
+            if (window.location.protocol === "file:") {
+                return ["http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+            }
+            const host = window.location.hostname;
+            const port = window.location.port;
+            if (port === "63342") {
+                return ["http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+            }
+            const originBase = `${window.location.protocol}//${host}${port ? `:${port}` : ""}`;
+            return [originBase, "http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+        })();
+
+        let API_URL = CANDIDATE_API_BASES[0];
         
         const endpoints = [
             { method: 'GET', path: '/', description: 'Service Message', color: 'blue' },
             { method: 'GET', path: '/health', description: 'Health Check', color: 'green' },
             { method: 'GET', path: '/jobs', description: 'Fetch All Jobs', color: 'green' },
             { method: 'GET', path: '/jobs/1', description: 'Fetch Single Job by ID', color: 'green' },
-            { method: 'POST', path: '/jobs', description: 'Create New Job', color: 'yellow' },
-            { method: 'POST', path: '/apply', description: 'Submit Application', color: 'yellow' },
-            { method: 'GET', path: '/applications', description: 'Fetch Applications (JOIN Query)', color: 'purple' }
+            { method: 'POST', path: '/auth/signup/recruiter', description: 'Recruiter Signup', color: 'yellow' },
+            { method: 'POST', path: '/auth/login', description: 'JWT Login', color: 'yellow' },
+            { method: 'GET', path: '/docs', description: 'Swagger Docs', color: 'purple' }
         ];
 
         let responseTimes = [];
         let successCount = 0;
         let totalCount = 0;
 
+        async function resolveApiBase() {
+            for (const base of CANDIDATE_API_BASES) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2500);
+                    const response = await fetch(`${base}/health`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        API_URL = base;
+                        return true;
+                    }
+                } catch (_) {}
+            }
+            return false;
+        }
+
         async function testEndpoint(endpoint) {
             const startTime = performance.now();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
-                const response = await fetch(`${API_URL}${endpoint.path}`);
+                const response = await fetch(`${API_URL}${endpoint.path}`, { signal: controller.signal });
                 const endTime = performance.now();
                 const responseTime = Math.round(endTime - startTime);
                 
@@ -177,6 +197,8 @@
             } catch (error) {
                 totalCount++;
                 return { success: false, time: 0, error: error.message };
+            } finally {
+                clearTimeout(timeoutId);
             }
         }
 
@@ -266,6 +288,7 @@
 
         // Initial load
         document.addEventListener('DOMContentLoaded', async () => {
+            await resolveApiBase();
             await checkServerStatus();
             await testAllEndpoints();
             

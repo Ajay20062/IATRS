@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: ats_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: iatrs
+      MYSQL_USER: ats_user
+      MYSQL_PASSWORD: ats_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uats_user", "-pats_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  api:
+    build: .
+    container_name: ats_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://ats_user:ats_pass@db:3306/iatrs
+      JWT_SECRET_KEY: change-this-secret
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/code/uploads
+
+volumes:
+  mysql_data:

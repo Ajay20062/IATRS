@@ -1,0 +1,23 @@
+:root {
+  --ats-bg: #f4f7fb;
+  --ats-card-radius: 14px;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.card {
+  border-radius: var(--ats-card-radius);
+}
+
+.form-control,
+.form-select,
+.btn {
+  border-radius: 10px;
+}
+
+.table thead th {
+  white-space: nowrap;
+}
+

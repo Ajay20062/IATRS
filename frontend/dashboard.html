@@ -1,344 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recruiter Dashboard - Smart ATS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white flex-shrink-0">
-            <div class="p-6">
-                <h1 class="text-2xl font-bold mb-8">Smart ATS</h1>
-                <nav class="space-y-2">
-                    <a href="dashboard.html" class="flex items-center px-4 py-3 bg-blue-700 rounded-lg">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Applications
-                    </a>
-                    <a href="index.html" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        Candidate Portal
-                    </a>
-                    <a href="database-schema.html" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        Schema Viewer
-                    </a>
-                    <a href="api-status.html" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        API Status
-                    </a>
-                </nav>
-            </div>
-            
-            <div class="absolute bottom-0 w-64 p-6 border-t border-blue-700">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span class="text-sm font-semibold">HR</span>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium">HR Manager</p>
-                        <p class="text-xs text-blue-300">Recruiter</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="./index.html">ATS</a>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto">
-            <!-- Header -->
-            <header class="bg-white shadow-sm">
-                <div class="px-8 py-6">
-                    <h2 class="text-3xl font-bold text-gray-800">Applications Dashboard</h2>
-                    <p class="text-gray-600 mt-1">Review and manage candidate applications</p>
-                </div>
-            </header>
+  <div class="container pb-4">
+    <div id="notifications"></div>
+    <h3 class="mb-3">Dashboard</h3>
+    <p class="text-muted mb-4">Role: <span id="roleLabel"></span></p>
 
-            <!-- Content -->
-            <div class="p-8">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Total Applications</p>
-                                <p id="totalApps" class="text-2xl font-bold text-gray-800">0</p>
-                            </div>
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+    <div id="candidateSection" class="d-none">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5>Find Jobs</h5>
+          <div class="row g-2">
+            <div class="col-md-4"><input class="form-control" id="searchTitle" placeholder="Search title" /></div>
+            <div class="col-md-3"><input class="form-control" id="searchLocation" placeholder="Location" /></div>
+            <div class="col-md-3"><input class="form-control" id="searchDept" placeholder="Department" /></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="loadJobs()">Search</button></div>
+          </div>
+        </div>
+      </div>
 
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Applied</p>
-                                <p id="appliedCount" class="text-2xl font-bold text-blue-600">0</p>
-                            </div>
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5>Open Jobs</h5>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle" id="jobsTable"></table>
+          </div>
+        </div>
+      </div>
 
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Hired</p>
-                                <p id="hiredCount" class="text-2xl font-bold text-green-600">0</p>
-                            </div>
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5>My Applications</h5>
+          <div class="table-responsive">
+            <table class="table table-striped" id="appsTable"></table>
+          </div>
+        </div>
+      </div>
 
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Rejected</p>
-                                <p id="rejectedCount" class="text-2xl font-bold text-red-600">0</p>
-                            </div>
-                            <div class="bg-red-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Applications Table -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-800">All Applications</h3>
-                    </div>
-                    
-                    <!-- Loading State -->
-                    <div id="loadingState" class="text-center py-12">
-                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        <p class="mt-4 text-gray-600">Loading applications...</p>
-                    </div>
-
-                    <!-- Error State -->
-                    <div id="errorState" class="hidden text-center py-12">
-                        <div class="text-red-600 text-xl mb-2">⚠️ Error Loading Applications</div>
-                        <p class="text-gray-600">Please make sure the backend server is running.</p>
-                    </div>
-
-                    <!-- Table -->
-                    <div id="tableContainer" class="hidden overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Candidate Name
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Job Role
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Applied Date
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Match Score
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- Rows will be dynamically inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Empty State -->
-                    <div id="emptyState" class="hidden text-center py-12">
-                        <p class="text-gray-500">No applications found.</p>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <div class="card">
+        <div class="card-body">
+          <h5>My Interviews</h5>
+          <div class="table-responsive">
+            <table class="table table-striped" id="interviewsTable"></table>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        const API_URL =
-            window.location.protocol === 'file:'
-                ? 'http://127.0.0.1:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`;
+    <div id="recruiterSection" class="d-none">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5>Post New Job</h5>
+          <form id="jobForm" class="row g-2">
+            <div class="col-md-3"><input class="form-control" id="jobTitle" placeholder="Title" required /></div>
+            <div class="col-md-3"><input class="form-control" id="jobDept" placeholder="Department" required /></div>
+            <div class="col-md-3"><input class="form-control" id="jobLoc" placeholder="Location" required /></div>
+            <div class="col-md-2">
+              <select class="form-select" id="jobStatus">
+                <option>Open</option><option>Closed</option><option>Paused</option>
+              </select>
+            </div>
+            <div class="col-md-1"><button class="btn btn-dark w-100" type="submit">Add</button></div>
+          </form>
+        </div>
+      </div>
 
-        // Load applications when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadApplications();
-        });
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5>Applications</h5>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle" id="recruiterAppsTable"></table>
+          </div>
+        </div>
+      </div>
 
-        // Fetch and display applications
-        async function loadApplications() {
-            const loadingState = document.getElementById('loadingState');
-            const errorState = document.getElementById('errorState');
-            const tableContainer = document.getElementById('tableContainer');
-            const emptyState = document.getElementById('emptyState');
-            const tableBody = document.getElementById('applicationsTableBody');
+      <div class="card">
+        <div class="card-body">
+          <h5>Schedule Interview</h5>
+          <form id="interviewForm" class="row g-2 mb-3">
+            <div class="col-md-3"><input class="form-control" id="applicationId" type="number" placeholder="Application ID" required /></div>
+            <div class="col-md-4"><input class="form-control" id="scheduledAt" type="datetime-local" required /></div>
+            <div class="col-md-3">
+              <select class="form-select" id="interviewType"><option>Phone</option><option>Video</option><option>Onsite</option></select>
+            </div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Schedule</button></div>
+          </form>
+          <div class="table-responsive">
+            <table class="table table-striped" id="recruiterInterviewsTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            try {
-                const response = await fetch(`${API_URL}/applications`);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch applications');
-                }
-
-                const applications = await response.json();
-                
-                // Hide loading state
-                loadingState.classList.add('hidden');
-
-                // Check if there are applications
-                if (applications.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-
-                // Show table
-                tableContainer.classList.remove('hidden');
-
-                // Clear table body
-                tableBody.innerHTML = '';
-
-                // Populate table with applications
-                applications.forEach(app => {
-                    const row = createApplicationRow(app);
-                    tableBody.appendChild(row);
-                });
-
-                // Update stats
-                updateStats(applications);
-
-            } catch (error) {
-                console.error('Error loading applications:', error);
-                loadingState.classList.add('hidden');
-                errorState.classList.remove('hidden');
-            }
-        }
-
-        // Create application table row
-        function createApplicationRow(app) {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50 transition-colors';
-            
-            // Generate a match score (between 60-98) for demonstration
-            const matchScore = Math.floor(Math.random() * 38) + 60;
-            
-            // Format date
-            const appliedDate = new Date(app.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span class="text-blue-600 font-semibold text-sm">${app.candidate_name.charAt(0)}</span>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${app.candidate_name}</div>
-                            <div class="text-sm text-gray-500">${app.candidate_email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${app.job_title}</div>
-                    <div class="text-sm text-gray-500">${app.department}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${appliedDate}</div>
-                    <div class="text-xs text-gray-500">${app.location}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyle(app.status)}">
-                        ${app.status}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-1 mr-3">
-                            <div class="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div class="absolute h-full ${getScoreColor(matchScore)} transition-all duration-500" style="width: ${matchScore}%"></div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-semibold ${getScoreTextColor(matchScore)}">${matchScore}%</span>
-                    </div>
-                </td>
-            `;
-            
-            return row;
-        }
-
-        // Get status styling
-        function getStatusStyle(status) {
-            switch(status) {
-                case 'Hired':
-                    return 'bg-green-100 text-green-800';
-                case 'Rejected':
-                    return 'bg-red-100 text-red-800';
-                case 'Interviewing':
-                    return 'bg-purple-100 text-purple-800';
-                case 'Screening':
-                    return 'bg-yellow-100 text-yellow-800';
-                case 'Applied':
-                    return 'bg-blue-100 text-blue-800';
-                default:
-                    return 'bg-gray-100 text-gray-800';
-            }
-        }
-
-        // Get score color for progress bar
-        function getScoreColor(score) {
-            if (score >= 85) return 'bg-green-500';
-            if (score >= 70) return 'bg-blue-500';
-            if (score >= 60) return 'bg-yellow-500';
-            return 'bg-red-500';
-        }
-
-        // Get score text color
-        function getScoreTextColor(score) {
-            if (score >= 85) return 'text-green-600';
-            if (score >= 70) return 'text-blue-600';
-            if (score >= 60) return 'text-yellow-600';
-            return 'text-red-600';
-        }
-
-        // Update statistics
-        function updateStats(applications) {
-            const total = applications.length;
-            const applied = applications.filter(app => app.status === 'Applied').length;
-            const hired = applications.filter(app => app.status === 'Hired').length;
-            const rejected = applications.filter(app => app.status === 'Rejected').length;
-
-            document.getElementById('totalApps').textContent = total;
-            document.getElementById('appliedCount').textContent = applied;
-            document.getElementById('hiredCount').textContent = hired;
-            document.getElementById('rejectedCount').textContent = rejected;
-        }
-    </script>
+  <script src="./js/app-common.js"></script>
+  <script src="./js/dashboard.js"></script>
 </body>
 </html>

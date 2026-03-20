@@ -40,7 +40,7 @@ if not exist ".env" (
     echo DB_HOST=localhost > .env
     echo DB_USER=root >> .env
     echo DB_PASSWORD= >> .env
-    echo DB_NAME=iats_db >> .env
+    echo DB_NAME=iatrs >> .env
     echo ✅ .env template created - Please update with your MySQL credentials
 ) else (
     echo ✅ .env file exists

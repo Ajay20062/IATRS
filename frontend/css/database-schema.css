@@ -1,0 +1,15 @@
+.table-card {
+  transition: all 0.3s ease;
+}
+
+.table-card:hover {
+  transform: translateY(-5px);
+}
+
+.relationship-line {
+  stroke: #3b82f6;
+  stroke-width: 2;
+  fill: none;
+  marker-end: url(#arrowhead);
+}
+

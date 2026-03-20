@@ -9,7 +9,7 @@ def create_db_connection():
     env_by_field = {
         "host": "localhost",
         "user": "root",
-        "database": "ats_db",
+        "database": "iatrs",
     }
     missing = [env_by_field[name] for name in env_by_field if not db_config.get(name)]
     if missing:

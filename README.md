@@ -1,86 +1,204 @@
-# DBMS-IATRS
+# Intelligent Applicant Tracking System (ATS)
 
-ATS backend with Flask + MySQL and a static frontend dashboard.
+A full-stack ATS built with:
+- Backend: FastAPI + SQLAlchemy
+- Database: MySQL
+- Auth: JWT + bcrypt hashing
+- Frontend: HTML/CSS/JavaScript (Bootstrap)
+- Testing: pytest
 
-## Project Structure
+## Repository Alignment
+
+This codebase is now aligned with the structure used in:
+`https://github.com/Aanishnithin07/DBMS-IATRS.git`
+
+Compatibility retained:
+- Root `app.py` entrypoint
+- Root `schema.sql`
+- Legacy helper `db_connect.py`
+- Utility frontend pages:
+  - `frontend/api-status.html`
+  - `frontend/database-schema.html`
+
+Primary implementation:
+- FastAPI app under `app/` (auth, jobs, applications, interviews)
+
+## Important Runtime Note
+
+This project is validated for **Python 3.12/3.13**.  
+If your machine only has **Python 3.14**, some dependencies (especially `pydantic-core`) may fail to install locally.
+
+Use either:
+- Docker (recommended, fully reproducible), or
+- Python 3.12 virtual environment.
+
+## 1. Project Structure
 
 ```text
-DBMS-IATRS/
-|- ats_api/              # Flask app package (factory, routes, config, db helpers)
-|- frontend/             # Static HTML pages
-|- app.py                # Application entrypoint
-|- setup_mysql.py        # Creates DB, applies schema, seeds data
-|- schema.sql            # MySQL schema
-|- requirements.txt      # Runtime dependencies
-|- .env.example          # Environment template
+project/
+│
+├── app/
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── auth.py
+│   ├── routes/
+│   │   ├── auth_routes.py
+│   │   ├── job_routes.py
+│   │   ├── application_routes.py
+│   │   └── interview_routes.py
+│   ├── utils/
+│   │   ├── security.py
+│   │   └── dependencies.py
+│
+├── frontend/
+│   ├── index.html
+│   ├── login.html
+│   ├── signup.html
+│   └── dashboard.html
+│
+├── database/
+│   └── schema.sql
+│
+├── docker-compose.yml
+├── Dockerfile
+├── .env.example
+│
+├── tests/
+│   ├── test_auth.py
+│   ├── test_jobs.py
+│   └── test_applications.py
+│
+├── requirements.txt
+└── README.md
 ```
 
-## Prerequisites
+## 2. Step-by-Step Setup
 
-- Python 3.10+ (recommended)
-- MySQL server running locally or remotely
+### Option A (Recommended): Run with Docker
 
-## Setup
+### Step A1: Start services
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Create `.env` from `.env.example` and set DB credentials.
-4. Initialize DB schema and seed data:
-   ```bash
-   python setup_mysql.py
-   ```
-
-## Run
-
-Start API server:
-
-```bash
-python app.py
+```powershell
+docker compose up --build
 ```
 
-Default API URL: `http://127.0.0.1:5000`
+### Step A2: Open app
 
-Serve frontend (optional, from `frontend/`):
+- Frontend: `http://127.0.0.1:8000/frontend/index.html`
+- API docs: `http://127.0.0.1:8000/docs`
+- Health: `http://127.0.0.1:8000/health`
 
-```bash
-python -m http.server 8080
+---
+
+### Option B: Run locally (Python 3.12)
+
+### Step B1: Create and activate virtual environment
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\activate
 ```
 
-Frontend URL: `http://127.0.0.1:8080`
+### Step B2: Install dependencies
 
-## API Endpoints
+```powershell
+pip install -r requirements.txt
+```
 
-- `GET /`
+### Step B3: Create MySQL database and tables
+
+1. Open MySQL.
+2. Run [`database/schema.sql`](database/schema.sql).
+
+### Step B4: Configure environment variables
+
+Set these before running:
+
+```powershell
+$env:DATABASE_URL="mysql+pymysql://root:password@localhost:3306/iatrs"
+$env:JWT_SECRET_KEY="replace-with-a-secure-secret"
+$env:AUTO_CREATE_TABLES="true"
+```
+
+### Step B5: Start FastAPI app
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+- API docs: `http://127.0.0.1:8000/docs`
+- Frontend: `http://127.0.0.1:8000/frontend/index.html`
+
+## 3. Authentication and Roles
+
+- Candidate signup: `POST /auth/signup/candidate` (supports resume upload).
+- Recruiter signup: `POST /auth/signup/recruiter`.
+- Login: `POST /auth/login`.
+- JWT token required for protected endpoints.
+- Role-based access:
+  - Recruiter: create/manage jobs, view applications, schedule interviews.
+  - Candidate: apply for jobs, track applications, view interviews.
+
+## 4. API Endpoints
+
+### Authentication
+- `POST /auth/signup/candidate`
+- `POST /auth/signup/recruiter`
+- `POST /auth/login`
+
+### Jobs
+- `GET /jobs` (supports `search`, `location`, `department`, `status`)
+- `POST /jobs` (Recruiter only)
+- `PUT /jobs/{id}` (Recruiter owner only)
+- `DELETE /jobs/{id}` (Recruiter owner only)
+
+### Applications
+- `POST /applications` (Candidate applies)
+- `GET /applications` (Recruiter sees their jobs, candidate sees own)
+- `PUT /applications/{id}/status` (Recruiter owner only)
+
+### Interviews
+- `POST /interviews` (Recruiter schedules)
+- `GET /interviews` (Role-based)
+- `PUT /interviews/{id}` (Recruiter owner only)
+
+### System
 - `GET /health`
-- `GET /jobs`
-- `GET /jobs?status=Open|Closed|Paused`
-- `GET /jobs/<job_id>`
-- `POST /jobs`
-- `POST /apply`
-- `GET /applications`
+- `GET /stats/schema` (live table counts for schema viewer)
 
-## Request Examples
+## 5. Frontend Modules
 
-Create job:
+- Login page
+- Signup page (candidate/recruiter tabs)
+- Candidate dashboard:
+  - search/filter jobs
+  - apply
+  - view application status badges
+  - view interview schedule
+- Recruiter dashboard:
+  - post jobs
+  - view applicants
+  - update application status
+  - schedule interviews
+  - basic notifications
 
-```json
-{
-  "title": "Backend Engineer",
-  "department": "Engineering",
-  "location": "Remote",
-  "recruiter_id": 1,
-  "status": "Open"
-}
+## 6. Run Tests
+
+```powershell
+pytest -q
 ```
 
-Apply for a job:
+Tests included:
+- Signup/Login
+- Job creation
+- Application submission and status update
 
-```json
-{
-  "candidate_id": 1,
-  "job_id": 1
-}
-```
+## 7. Notes
+
+- The requested ATS tables are implemented exactly.
+- A supplemental `user_credentials` table is added for password hashing and JWT authentication.
+- Resume uploads are stored as local file paths in `uploads/`.
+- `/health` endpoint added for service checks.
+- Frontend pages use relative navigation links for better compatibility across local preview and API-hosted mode.

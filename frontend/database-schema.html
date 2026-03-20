@@ -5,20 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database Schema - ATS System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .table-card {
-            transition: all 0.3s ease;
-        }
-        .table-card:hover {
-            transform: translateY(-5px);
-        }
-        .relationship-line {
-            stroke: #3b82f6;
-            stroke-width: 2;
-            fill: none;
-            marker-end: url(#arrowhead);
-        }
-    </style>
+    <link rel="stylesheet" href="./css/database-schema.css">
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Header -->
@@ -302,13 +289,36 @@
     </main>
 
     <script>
-        const API_URL =
-            window.location.protocol === 'file:'
-                ? 'http://127.0.0.1:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`;
+        const CANDIDATE_API_BASES = (() => {
+            if (window.location.protocol === "file:") {
+                return ["http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+            }
+
+            const host = window.location.hostname;
+            const port = window.location.port;
+            if (port === "63342") {
+                return ["http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+            }
+
+            const originBase = `${window.location.protocol}//${host}${port ? `:${port}` : ""}`;
+            return [originBase, "http://127.0.0.1:8000", "http://127.0.0.1:5000"];
+        })();
+
+        let API_URL = CANDIDATE_API_BASES[0];
+
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 5000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                return response;
+            } finally {
+                clearTimeout(id);
+            }
+        }
 
         async function fetchJsonOrThrow(path) {
-            const response = await fetch(`${API_URL}${path}`);
+            const response = await fetchWithTimeout(`${API_URL}${path}`);
             const body = await response.json();
             if (!response.ok) {
                 const message = body && body.error ? body.error : `HTTP ${response.status}`;
@@ -317,41 +327,108 @@
             return body;
         }
 
+        async function resolveApiBase() {
+            for (const base of CANDIDATE_API_BASES) {
+                try {
+                    const healthResponse = await fetchWithTimeout(`${base}/health`, {}, 2500);
+                    if (healthResponse.ok) {
+                        API_URL = base;
+                        return true;
+                    }
+                } catch (_) {}
+
+                try {
+                    const rootResponse = await fetchWithTimeout(`${base}/`, {}, 2500);
+                    if (rootResponse.ok) {
+                        API_URL = base;
+                        return true;
+                    }
+                } catch (_) {}
+            }
+            return false;
+        }
+
+        function setOfflineCounts() {
+            document.getElementById('jobsCount').textContent = 'N/A';
+            document.getElementById('applicationsCount').textContent = 'N/A';
+            document.getElementById('candidatesCount').textContent = 'N/A';
+            document.getElementById('recruitersCount').textContent = 'N/A';
+            document.getElementById('interviewsCount').textContent = 'N/A';
+            document.getElementById('totalRecords').textContent = 'N/A';
+        }
+
+        function showOfflinePreview() {
+            document.getElementById('dataPreview').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded">
+                        <div class="font-semibold text-amber-800">Offline Preview Mode</div>
+                        <div class="text-sm text-amber-700 mt-1">
+                            Backend is not running. Schema UI is available, live record counts are disabled.
+                        </div>
+                        <div class="text-sm text-amber-700 mt-2">
+                            Start API with: <code>uvicorn app.main:app --reload</code>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-bold text-lg mb-3">Sample Jobs</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-blue-500">
+                                    <div class="font-semibold">Backend Engineer</div>
+                                    <div class="text-sm text-gray-600">Engineering • Chennai</div>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-blue-500">
+                                    <div class="font-semibold">Data Analyst</div>
+                                    <div class="text-sm text-gray-600">Analytics • Bengaluru</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-3">Sample Applications</h3>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                                    <div class="font-semibold">Priya K</div>
+                                    <div class="text-sm text-gray-600">Backend Engineer • Applied</div>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                                    <div class="font-semibold">Arun V</div>
+                                    <div class="text-sm text-gray-600">Data Analyst • Screening</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         async function loadDatabaseStats() {
             try {
-                // Fetch counts from different endpoints
-                const [jobs, applications] = await Promise.all([
-                    fetchJsonOrThrow('/jobs'),
-                    fetchJsonOrThrow('/applications')
-                ]);
+                const apiAvailable = await resolveApiBase();
+                if (!apiAvailable) {
+                    setOfflineCounts();
+                    showOfflinePreview();
+                    return;
+                }
+
+                const stats = await fetchJsonOrThrow('/stats/schema');
+                const jobs = await fetchJsonOrThrow('/jobs');
+                const applications = [];
 
                 // Update counts
-                document.getElementById('jobsCount').textContent = jobs.length;
-                document.getElementById('applicationsCount').textContent = applications.length;
-                
-                // Calculate unique counts from applications data
-                const uniqueCandidates = new Set(applications.map(app => app.candidate_email)).size;
-                const uniqueRecruiters = 5; // We know we have 5 from setup
-                
-                document.getElementById('candidatesCount').textContent = uniqueCandidates || 5;
-                document.getElementById('recruitersCount').textContent = uniqueRecruiters;
-                document.getElementById('interviewsCount').textContent = '0';
-                
-                // Total records
-                const total = jobs.length + applications.length + 5 + 5; // +5 candidates, +5 recruiters
-                document.getElementById('totalRecords').textContent = total;
+                document.getElementById('jobsCount').textContent = stats.jobs;
+                document.getElementById('applicationsCount').textContent = stats.applications;
+                document.getElementById('candidatesCount').textContent = stats.candidates;
+                document.getElementById('recruitersCount').textContent = stats.recruiters;
+                document.getElementById('interviewsCount').textContent = stats.interviews;
+                document.getElementById('totalRecords').textContent = stats.total_records;
 
                 // Show data preview
                 showDataPreview(jobs, applications);
 
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('dataPreview').innerHTML = `
-                    <div class="text-center py-8 text-red-600">
-                        <p>⚠️ API error: ${error.message}</p>
-                        <p class="text-sm mt-2">Run backend on ${API_URL}</p>
-                    </div>
-                `;
+                setOfflineCounts();
+                showOfflinePreview();
             }
         }
 
@@ -373,12 +450,10 @@
                     <div>
                         <h3 class="font-bold text-lg mb-3">Recent Applications</h3>
                         <div class="space-y-2">
-                            ${applications.slice(0, 3).map(app => `
-                                <div class="p-3 bg-gray-50 rounded border-l-4 border-green-500">
-                                    <div class="font-semibold">${app.candidate_name}</div>
-                                    <div class="text-sm text-gray-600">${app.job_title} • ${app.status}</div>
-                                </div>
-                            `).join('')}
+                            <div class="p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                                <div class="font-semibold">Protected Data</div>
+                                <div class="text-sm text-gray-600">Applications require recruiter/candidate JWT.</div>
+                            </div>
                         </div>
                     </div>
                 </div>

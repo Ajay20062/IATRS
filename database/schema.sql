@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS interviews (
         ON DELETE CASCADE
 );
 
--- Supplemental auth table for JWT login.
+-- Extra auth table required for JWT login while keeping ATS schema intact.
 CREATE TABLE IF NOT EXISTS user_credentials (
     credential_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(120) NOT NULL UNIQUE,

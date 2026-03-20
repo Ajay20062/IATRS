@@ -1,33 +1,9 @@
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# Python
+.venv/
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-*.egg-info/
-dist/
-build/
-
-# IDEs
-.vscode/
+*.pyc
+.pytest_cache/
+test_ats.db
+uploads/*
+!uploads/.gitkeep
+.env
 .idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
