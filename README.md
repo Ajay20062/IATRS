@@ -7,10 +7,6 @@ A full-stack ATS built with:
 - Frontend: HTML/CSS/JavaScript (Bootstrap)
 - Testing: pytest
 
-## Repository Alignment
-
-This codebase is now aligned with the structure used in:
-`https://github.com/Aanishnithin07/DBMS-IATRS.git`
 
 Compatibility retained:
 - Root `app.py` entrypoint
