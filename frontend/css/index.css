@@ -1,10 +1,93 @@
-body {
-  background: linear-gradient(135deg, #e8f3ff, #f9fcff);
-  min-height: 100vh;
-}
-
 .hero {
-  max-width: 900px;
-  margin: 72px auto;
+  position: relative;
+  max-width: 1080px;
+  margin: 3.5rem auto 2.25rem;
 }
 
+.hero-shell {
+  position: relative;
+  z-index: 2;
+  padding: 2.8rem clamp(1.1rem, 4vw, 3rem);
+  border-radius: 28px;
+  border: 1px solid rgba(30, 58, 138, 0.16);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.9), rgba(245, 250, 255, 0.86));
+  box-shadow: 0 28px 70px rgba(20, 33, 61, 0.13);
+}
+
+.hero-shell .lead {
+  max-width: 770px;
+  margin-inline: auto;
+}
+
+.cta-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+}
+
+.value-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.value-card {
+  text-align: left;
+  padding: 1rem 1.05rem;
+  border-radius: 14px;
+  border: 1px solid rgba(30, 58, 138, 0.14);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.value-card h5 {
+  margin-bottom: 0.35rem;
+  font-size: 1.01rem;
+}
+
+.value-card p {
+  margin: 0;
+  color: #52607a;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: -1rem;
+  z-index: 1;
+  border-radius: 30px;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(13, 148, 136, 0.15), rgba(249, 115, 22, 0.16), rgba(37, 99, 235, 0.16), rgba(13, 148, 136, 0.15));
+  filter: blur(45px);
+  opacity: 0.7;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: -1.2rem;
+  z-index: 0;
+  border-radius: 30px;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
+}
+
+@media (max-width: 767.98px) {
+  .hero {
+    margin-top: 2.2rem;
+  }
+
+  .hero-shell {
+    border-radius: 20px;
+    padding: 1.55rem 0.95rem;
+  }
+
+  .hero-shell h1 {
+    font-size: clamp(1.8rem, 8vw, 2.25rem);
+  }
+
+  .cta-grid {
+    grid-template-columns: 1fr;
+  }
+}

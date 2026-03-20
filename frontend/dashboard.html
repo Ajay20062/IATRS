@@ -9,20 +9,27 @@
   <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
+  <nav class="navbar navbar-expand-lg app-navbar mb-4">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="./index.html">ATS</a>
+      <a class="navbar-brand fw-bold" href="./index.html">ATS Workspace</a>
       <button class="btn btn-outline-danger btn-sm" onclick="logout()">Logout</button>
     </div>
   </nav>
 
-  <div class="container pb-4">
+  <div class="container pb-4 dashboard-shell">
     <div id="notifications"></div>
-    <h3 class="mb-3">Dashboard</h3>
-    <p class="text-muted mb-4">Role: <span id="roleLabel"></span></p>
+    <div class="dashboard-head">
+      <h3 class="mb-2">Dashboard</h3>
+      <p class="text-muted mb-4">Role: <span id="roleLabel"></span></p>
+      <div class="head-chips">
+        <span class="chip">Hiring velocity board</span>
+        <span class="chip">Live application updates</span>
+        <span class="chip">Interview orchestration</span>
+      </div>
+    </div>
 
     <div id="candidateSection" class="d-none">
-      <div class="card mb-3">
+      <div class="card section-card mb-3">
         <div class="card-body">
           <h5>Find Jobs</h5>
           <div class="row g-2">
@@ -34,7 +41,7 @@
         </div>
       </div>
 
-      <div class="card mb-3">
+      <div class="card section-card mb-3">
         <div class="card-body">
           <h5>Open Jobs</h5>
           <div class="table-responsive">
@@ -43,7 +50,7 @@
         </div>
       </div>
 
-      <div class="card mb-3">
+      <div class="card section-card mb-3">
         <div class="card-body">
           <h5>My Applications</h5>
           <div class="table-responsive">
@@ -52,7 +59,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card section-card">
         <div class="card-body">
           <h5>My Interviews</h5>
           <div class="table-responsive">
@@ -63,7 +70,7 @@
     </div>
 
     <div id="recruiterSection" class="d-none">
-      <div class="card mb-3">
+      <div class="card section-card mb-3">
         <div class="card-body">
           <h5>Post New Job</h5>
           <form id="jobForm" class="row g-2">
@@ -80,7 +87,7 @@
         </div>
       </div>
 
-      <div class="card mb-3">
+      <div class="card section-card mb-3">
         <div class="card-body">
           <h5>Applications</h5>
           <div class="table-responsive">
@@ -89,7 +96,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card section-card">
         <div class="card-body">
           <h5>Schedule Interview</h5>
           <form id="interviewForm" class="row g-2 mb-3">

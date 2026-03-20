@@ -8,16 +8,35 @@
   <link rel="stylesheet" href="./css/common.css" />
   <link rel="stylesheet" href="./css/signup.css" />
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
+<body class="auth-page">
+  <div class="container py-5 signup-wrap">
+    <div class="row g-4 justify-content-center align-items-stretch">
+      <div class="col-xl-3 col-lg-4 fade-up">
+        <section class="signup-info h-100">
+          <span class="chip mb-3">Onboarding</span>
+          <h3 class="mb-3">Build Your Hiring Profile</h3>
+          <p class="text-muted mb-4">Candidates can showcase their profile while recruiters create structured hiring pipelines.</p>
+          <div class="mini-stat">
+            <span class="mini-stat-label">Roles supported</span>
+            <strong>Candidate / Recruiter</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-label">File support</span>
+            <strong>Resume upload</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-label">Data mode</span>
+            <strong>MySQL + FastAPI</strong>
+          </div>
+        </section>
+      </div>
+      <div class="col-xl-8 col-lg-8 fade-up delay-1">
+        <div class="card signup-card">
+          <div class="card-body p-4 p-lg-5">
             <h3>Create Account</h3>
             <p class="text-muted mb-4">Choose role and complete signup.</p>
 
-            <ul class="nav nav-tabs mb-3" id="signupTabs" role="tablist">
+            <ul class="nav nav-tabs mb-3 role-tabs" id="signupTabs" role="tablist">
               <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#candidateTab" type="button">Candidate</button></li>
               <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#recruiterTab" type="button">Recruiter</button></li>
             </ul>

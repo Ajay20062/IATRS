@@ -1,8 +1,59 @@
-body {
-  background: #f8f9fa;
+.signup-wrap {
+  max-width: 1200px;
 }
 
-.card {
-  border: 0;
+.signup-info {
+  padding: 1.2rem 0.6rem;
 }
 
+.signup-info h3 {
+  font-size: clamp(1.65rem, 4vw, 2.1rem);
+}
+
+.mini-stat {
+  display: grid;
+  padding: 0.8rem 0.95rem;
+  margin-bottom: 0.7rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(30, 58, 138, 0.12);
+}
+
+.mini-stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5d6b85;
+}
+
+.signup-card {
+  border: 1px solid rgba(30, 58, 138, 0.16);
+}
+
+.role-tabs {
+  border-bottom: 0;
+  gap: 0.5rem;
+}
+
+.role-tabs .nav-link {
+  border: 1px solid rgba(30, 58, 138, 0.16);
+  border-radius: 12px;
+  color: #36517c;
+  padding: 0.6rem 0.95rem;
+  font-weight: 700;
+}
+
+.role-tabs .nav-link.active {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.18), rgba(37, 99, 235, 0.18));
+  color: #193f79;
+}
+
+#msg {
+  min-height: 1.1rem;
+}
+
+@media (max-width: 991.98px) {
+  .signup-info {
+    padding-bottom: 0;
+  }
+}

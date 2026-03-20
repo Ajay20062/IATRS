@@ -8,24 +8,42 @@
   <link rel="stylesheet" href="./css/common.css" />
   <link rel="stylesheet" href="./css/login.css" />
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
-            <h3 class="mb-3">Login</h3>
+<body class="auth-page">
+  <div class="container py-5 auth-wrap">
+    <div class="row g-4 align-items-stretch justify-content-center">
+      <div class="col-lg-5 fade-up">
+        <section class="auth-info h-100">
+          <span class="chip mb-3">Secure Workspace Access</span>
+          <h2 class="mb-3">Welcome Back</h2>
+          <p class="text-muted mb-4">Sign in as a recruiter or candidate to continue hiring workflows and application tracking.</p>
+          <div class="auth-points">
+            <div class="point-item">
+              <strong>Application timeline:</strong> Monitor every stage from apply to interview.
+            </div>
+            <div class="point-item">
+              <strong>Unified dashboard:</strong> One place for jobs, statuses, and schedules.
+            </div>
+            <div class="point-item">
+              <strong>Fast login:</strong> JWT based session for protected ATS actions.
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="col-md-8 col-lg-5 fade-up delay-1">
+        <div class="card auth-card h-100">
+          <div class="card-body p-4 p-lg-5">
+            <h3 class="mb-2">Login</h3>
             <p class="text-muted">Use your candidate or recruiter account.</p>
-            <form id="loginForm">
+            <form id="loginForm" class="mt-4">
               <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" required />
+                <input type="email" class="form-control" id="email" placeholder="you@company.com" required />
               </div>
               <div class="mb-3">
                 <label class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" required />
+                <input type="password" class="form-control" id="password" placeholder="Enter password" required />
               </div>
-              <button class="btn btn-primary w-100" type="submit">Login</button>
+              <button class="btn btn-primary w-100 mt-2" type="submit">Login</button>
             </form>
             <div class="mt-3 text-center">
               <a href="./signup.html">Create an account</a>

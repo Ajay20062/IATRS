@@ -1,8 +1,43 @@
-body {
-  background: #f5f8fc;
+.app-navbar {
+  background: rgba(255, 255, 255, 0.84);
+  border-bottom: 1px solid rgba(30, 58, 138, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-shell {
+  max-width: 1250px;
+}
+
+.dashboard-head {
+  margin-bottom: 1rem;
+}
+
+.head-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.section-card .card-body {
+  padding: 1.2rem 1.15rem;
+}
+
+.section-card h5 {
+  margin-bottom: 0.9rem;
+  font-size: 1.12rem;
 }
 
 .badge-status {
   font-size: 0.75rem;
 }
 
+@media (max-width: 767.98px) {
+  .section-card .card-body {
+    padding: 1rem 0.9rem;
+  }
+
+  .app-navbar .container {
+    gap: 0.8rem;
+  }
+}

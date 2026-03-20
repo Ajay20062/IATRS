@@ -1,23 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
+
 :root {
-  --ats-bg: #f4f7fb;
-  --ats-card-radius: 14px;
+  --ats-bg: #f5f8ff;
+  --ats-bg-soft: #e8efff;
+  --ats-surface: rgba(255, 255, 255, 0.88);
+  --ats-border: rgba(30, 58, 138, 0.12);
+  --ats-text: #14213d;
+  --ats-muted: #55627d;
+  --ats-primary-start: #0d9488;
+  --ats-primary-end: #2563eb;
+  --ats-accent: #f97316;
+  --ats-radius: 18px;
+  --ats-shadow: 0 20px 60px rgba(20, 33, 61, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
+  position: relative;
   min-height: 100vh;
+  font-family: "Manrope", sans-serif;
+  color: var(--ats-text);
+  background:
+    radial-gradient(1200px 600px at -10% -5%, #d4f5ff 0%, transparent 45%),
+    radial-gradient(900px 500px at 110% 0%, #ffe8cf 0%, transparent 42%),
+    linear-gradient(155deg, var(--ats-bg) 0%, var(--ats-bg-soft) 100%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+a {
+  color: #0b67df;
+  text-decoration-thickness: 1.5px;
+}
+
+a:hover {
+  color: #094eb0;
 }
 
 .card {
-  border-radius: var(--ats-card-radius);
+  border: 1px solid var(--ats-border);
+  border-radius: var(--ats-radius);
+  background: var(--ats-surface);
+  box-shadow: var(--ats-shadow);
+  backdrop-filter: blur(8px);
+}
+
+.btn {
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background-image: linear-gradient(135deg, var(--ats-primary-start), var(--ats-primary-end));
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  border-color: transparent;
+  filter: brightness(1.04);
+}
+
+.btn-outline-primary {
+  border-color: rgba(37, 99, 235, 0.4);
+  color: #1246a2;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: #0f3e90;
 }
 
 .form-control,
-.form-select,
-.btn {
-  border-radius: 10px;
+.form-select {
+  border-radius: 12px;
+  border: 1px solid rgba(20, 33, 61, 0.16);
+  padding: 0.7rem 0.85rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(13, 148, 136, 0.65);
+  box-shadow: 0 0 0 0.2rem rgba(13, 148, 136, 0.16);
+}
+
+.table {
+  --bs-table-bg: transparent;
 }
 
 .table thead th {
   white-space: nowrap;
+  border-bottom-width: 1px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4a5a78;
 }
 
+.table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--ats-border);
+  background: rgba(255, 255, 255, 0.72);
+  color: #33507f;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.65s ease forwards;
+}
+
+.fade-up.delay-1 {
+  animation-delay: 0.12s;
+}
+
+.fade-up.delay-2 {
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --ats-radius: 16px;
+  }
+
+  .card {
+    box-shadow: 0 12px 35px rgba(20, 33, 61, 0.12);
+  }
+}

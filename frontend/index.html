@@ -9,16 +9,41 @@
   <link rel="stylesheet" href="./css/index.css" />
 </head>
 <body>
-  <div class="container hero text-center">
-    <h1 class="display-5 fw-bold mb-3">Intelligent Applicant Tracking System</h1>
-    <p class="lead text-muted mb-4">Recruiters can post jobs and manage applicants. Candidates can apply, track status, and view interviews.</p>
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="./login.html" class="btn btn-primary btn-lg">Login</a>
-      <a href="./signup.html" class="btn btn-outline-primary btn-lg">Signup</a>
-      <a href="/docs" class="btn btn-dark btn-lg">API Docs</a>
-      <a href="./api-status.html" class="btn btn-success btn-lg">API Status</a>
-      <a href="./database-schema.html" class="btn btn-secondary btn-lg">Schema Viewer</a>
-    </div>
+  <div class="container hero">
+    <section class="hero-shell text-center fade-up">
+      <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+        <span class="chip">AI-ready hiring workflow</span>
+        <span class="chip">Recruiter + Candidate portal</span>
+        <span class="chip">Live API visibility</span>
+      </div>
+      <h1 class="display-4 fw-bold mb-3">Intelligent Applicant Tracking System</h1>
+      <p class="lead text-muted mb-4">
+        A complete recruiting cockpit to publish jobs, review applicants, track interview pipelines, and keep candidates informed in real time.
+      </p>
+      <div class="cta-grid mb-4">
+        <a href="./login.html" class="btn btn-primary btn-lg">Login</a>
+        <a href="./signup.html" class="btn btn-outline-primary btn-lg">Create Account</a>
+        <a href="/docs" class="btn btn-dark btn-lg">API Docs</a>
+        <a href="./api-status.html" class="btn btn-success btn-lg">API Status</a>
+        <a href="./database-schema.html" class="btn btn-secondary btn-lg">Schema Viewer</a>
+      </div>
+      <div class="value-grid fade-up delay-1">
+        <article class="value-card">
+          <h5>Smart Job Discovery</h5>
+          <p>Filter by title, location, and department with instant candidate-side apply actions.</p>
+        </article>
+        <article class="value-card">
+          <h5>Pipeline Control</h5>
+          <p>Move applications across stages and schedule interviews from one recruiter dashboard.</p>
+        </article>
+        <article class="value-card">
+          <h5>System Transparency</h5>
+          <p>Inspect live API health and relational schema from dedicated diagnostic pages.</p>
+        </article>
+      </div>
+    </section>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
   </div>
 </body>
 </html>
