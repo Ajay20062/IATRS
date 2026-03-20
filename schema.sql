@@ -1,12 +1,12 @@
-CREATE TABLE Recruiters (
+CREATE TABLE IF NOT EXISTS Recruiters (
     recruiter_id INT PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
     company VARCHAR(150),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-CREATE TABLE Jobs (
+CREATE TABLE IF NOT EXISTS Jobs (
     job_id INT PRIMARY KEY AUTO_INCREMENT,
     recruiter_id INT NOT NULL,
     title VARCHAR(150) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE Jobs (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE Candidates (
+CREATE TABLE IF NOT EXISTS Candidates (
     candidate_id INT PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -29,12 +29,13 @@ CREATE TABLE Candidates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-CREATE TABLE Applications (
+CREATE TABLE IF NOT EXISTS Applications (
     application_id INT PRIMARY KEY AUTO_INCREMENT,
     job_id INT NOT NULL,
     candidate_id INT NOT NULL,
     status ENUM('Applied', 'Screening', 'Interviewing', 'Rejected', 'Hired') NOT NULL DEFAULT 'Applied',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_job_candidate UNIQUE (job_id, candidate_id),
     CONSTRAINT fk_applications_job
         FOREIGN KEY (job_id)
         REFERENCES Jobs(job_id)
@@ -45,7 +46,7 @@ CREATE TABLE Applications (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE Interviews (
+CREATE TABLE IF NOT EXISTS Interviews (
     interview_id INT PRIMARY KEY AUTO_INCREMENT,
     application_id INT NOT NULL,
     scheduled_at DATETIME NOT NULL,

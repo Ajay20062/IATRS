@@ -139,12 +139,14 @@
     </main>
 
     <script>
-        const API_URL = window.location.protocol.startsWith('http')
-            ? window.location.origin
-            : 'http://127.0.0.1:5000';
+        const API_URL =
+            window.location.protocol === 'file:'
+                ? 'http://127.0.0.1:5000'
+                : `${window.location.protocol}//${window.location.hostname}:5000`;
         
         const endpoints = [
-            { method: 'GET', path: '/', description: 'Health Check - API Status', color: 'blue' },
+            { method: 'GET', path: '/', description: 'Service Message', color: 'blue' },
+            { method: 'GET', path: '/health', description: 'Health Check', color: 'green' },
             { method: 'GET', path: '/jobs', description: 'Fetch All Jobs', color: 'green' },
             { method: 'GET', path: '/jobs/1', description: 'Fetch Single Job by ID', color: 'green' },
             { method: 'POST', path: '/jobs', description: 'Create New Job', color: 'yellow' },
@@ -186,21 +188,21 @@
                 if (result.success) {
                     statusDiv.innerHTML = `
                         <div class="w-4 h-4 bg-green-500 rounded-full pulse-dot mr-3"></div>
-                        <span class="text-lg font-semibold text-green-400">✓ Online</span>
+                        <span class="text-lg font-semibold text-green-400">✓ Online (${API_URL})</span>
                     `;
                     document.getElementById('dbStatus').className = 'w-3 h-3 bg-green-500 rounded-full pulse-dot';
                 } else {
                     statusDiv.innerHTML = `
                         <div class="w-4 h-4 bg-red-500 rounded-full pulse-dot mr-3"></div>
-                        <span class="text-lg font-semibold text-red-400">✗ Offline</span>
+                        <span class="text-lg font-semibold text-red-400">✗ Offline (${result.error || `HTTP ${result.status}`})</span>
                     `;
                     document.getElementById('dbStatus').className = 'w-3 h-3 bg-red-500 rounded-full pulse-dot';
                 }
             } catch (error) {
                 const statusDiv = document.getElementById('serverStatus');
-                statusDiv.innerHTML = `
+                    statusDiv.innerHTML = `
                     <div class="w-4 h-4 bg-red-500 rounded-full pulse-dot mr-3"></div>
-                    <span class="text-lg font-semibold text-red-400">✗ Offline</span>
+                    <span class="text-lg font-semibold text-red-400">✗ Offline (${error.message})</span>
                 `;
             }
         }
@@ -208,19 +210,13 @@
         async function testAllEndpoints() {
             const container = document.getElementById('endpointsList');
             container.innerHTML = '';
-            const methodColorClass = {
-                blue: 'bg-blue-500',
-                green: 'bg-green-500',
-                yellow: 'bg-yellow-500',
-                purple: 'bg-purple-500'
-            };
 
             for (const endpoint of endpoints) {
                 const endpointDiv = document.createElement('div');
                 endpointDiv.className = 'bg-gray-700 rounded-lg p-4 flex items-center justify-between';
                 endpointDiv.innerHTML = `
                     <div class="flex items-center flex-1">
-                        <span class="px-3 py-1 ${methodColorClass[endpoint.color] || 'bg-gray-500'} text-white rounded text-sm font-semibold mr-4">
+                        <span class="px-3 py-1 bg-${endpoint.color}-500 text-white rounded text-sm font-semibold mr-4">
                             ${endpoint.method}
                         </span>
                         <div>
@@ -242,7 +238,7 @@
                         statusEl.textContent = `✓ ${result.time}ms`;
                     } else {
                         statusEl.className = 'text-red-400 text-sm font-semibold';
-                        statusEl.textContent = result.error ? '✗ Failed' : `✗ ${result.status}`;
+                        statusEl.textContent = result.error ? `✗ ${result.error}` : `✗ HTTP ${result.status}`;
                     }
                 } else {
                     const statusEl = endpointDiv.querySelector('div:last-child');

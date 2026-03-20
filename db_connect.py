@@ -1,30 +1,15 @@
-import mysql.connector
-from mysql.connector import Error
-import os
-from dotenv import load_dotenv
+from ats_api.db import Error, create_db_connection
 
-# Load environment variables from .env file
-load_dotenv()
 
 def get_db_connection():
     """
-    Establish and return a MySQL database connection.
-    
+    Backward-compatible wrapper used by existing setup scripts.
+
     Returns:
-        mysql.connector.connection.MySQLConnection: Database connection object if successful
-        None: If connection fails
+        mysql.connector.connection.MySQLConnection | None
     """
     try:
-        connection = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
-        )
-        
-        if connection.is_connected():
-            return connection
-            
-    except Error as e:
-        print(f"Error: Could not connect to MySQL Server - {e}")
+        return create_db_connection()
+    except (Error, ValueError) as exc:
+        print(f"Error: Could not connect to MySQL Server - {exc}")
         return None

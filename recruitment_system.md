@@ -1,8 +1,8 @@
-ERDiagram
-    RECRUITERS ||--o{ JOBS : posts
-    JOBS ||--o{ APPLICATIONS : receives
-    CANDIDATES ||--o{ APPLICATIONS : submits
-    APPLICATIONS ||--o{ INTERVIEWS : has
+erDiagram
+RECRUITERS ||--o{ JOBS : posts
+JOBS ||--o{ APPLICATIONS : receives
+CANDIDATES ||--o{ APPLICATIONS : submits
+APPLICATIONS ||--o{ INTERVIEWS : has
 
     RECRUITERS {
         int recruiter_id PK
