@@ -1,0 +1,439 @@
+/**
+ * Dark Mode Styles for IATRS Frontend
+ * Add this file as css/dark-mode.css
+ */
+
+/* CSS Variables for Theme */
+:root {
+    /* Light Mode (Default) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-tertiary: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-tertiary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-primary: #2563eb;
+    --accent-secondary: #3b82f6;
+    --accent-hover: #1d4ed8;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --input-bg: #ffffff;
+    --hover-bg: #f9fafb;
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --border-color: #374151;
+    --accent-primary: #3b82f6;
+    --accent-secondary: #60a5fa;
+    --accent-hover: #2563eb;
+    --success-color: #34d399;
+    --warning-color: #fbbf24;
+    --error-color: #f87171;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --input-bg: #1f2937;
+    --hover-bg: #374151;
+}
+
+/* Smooth Theme Transition */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Body */
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Header */
+header {
+    background-color: var(--bg-primary);
+    box-shadow: var(--card-shadow);
+}
+
+header h1,
+header h2,
+header h3 {
+    color: var(--text-primary);
+}
+
+header p {
+    color: var(--text-secondary);
+}
+
+/* Cards */
+.card,
+.table-card,
+.bg-white {
+    background-color: var(--bg-primary) !important;
+    box-shadow: var(--card-shadow);
+}
+
+/* Buttons */
+button,
+.btn {
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+}
+
+button:hover,
+.btn:hover {
+    background-color: var(--accent-hover);
+}
+
+button.secondary,
+.btn.secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+button.secondary:hover,
+.btn.secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* Input Fields */
+input,
+textarea,
+select {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* Tables */
+table {
+    background-color: var(--bg-primary);
+}
+
+table thead {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+table tbody tr {
+    border-bottom-color: var(--border-color);
+}
+
+table tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+table td {
+    color: var(--text-secondary);
+}
+
+/* Badges */
+.badge,
+.status-badge {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.badge-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.badge-error {
+    background-color: var(--error-color);
+    color: white;
+}
+
+/* Links */
+a {
+    color: var(--accent-primary);
+}
+
+a:hover {
+    color: var(--accent-secondary);
+}
+
+/* Modal */
+.modal-content,
+#modalContentWrapper {
+    background-color: var(--bg-primary);
+}
+
+.modal-header {
+    background-color: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+}
+
+.modal-body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Navigation */
+nav {
+    background-color: var(--bg-primary);
+}
+
+nav a {
+    color: var(--text-secondary);
+}
+
+nav a:hover,
+nav a.active {
+    color: var(--accent-primary);
+    background-color: var(--hover-bg);
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--bg-primary);
+    border-right-color: var(--border-color);
+}
+
+/* Footer */
+footer {
+    background-color: var(--bg-primary);
+    border-top-color: var(--border-color);
+}
+
+footer p {
+    color: var(--text-tertiary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Custom Dark Mode Toggle Button */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    background-color: var(--accent-hover);
+}
+
+/* Form Labels */
+label {
+    color: var(--text-secondary);
+}
+
+/* Alert Boxes */
+.alert {
+    background-color: var(--bg-tertiary);
+    border-left: 4px solid var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.alert-success {
+    border-left-color: var(--success-color);
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.alert-warning {
+    border-left-color: var(--warning-color);
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
+.alert-error {
+    border-left-color: var(--error-color);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Code Blocks */
+code,
+pre {
+    background-color: var(--bg-tertiary);
+    color: var(--accent-secondary);
+}
+
+/* Progress Bars */
+.progress-bar {
+    background-color: var(--bg-tertiary);
+}
+
+.progress-bar-fill {
+    background-color: var(--accent-primary);
+}
+
+/* Tooltips */
+.tooltip {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+/* Loading Spinner */
+.spinner {
+    border-color: var(--border-color);
+    border-top-color: var(--accent-primary);
+}
+
+/* Dashboard Stats Cards */
+.stat-card {
+    background-color: var(--bg-primary);
+    box-shadow: var(--card-shadow);
+}
+
+.stat-card .stat-value {
+    color: var(--accent-primary);
+}
+
+.stat-card .stat-label {
+    color: var(--text-secondary);
+}
+
+/* Chart Containers */
+.chart-container {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+/* Notification Badge */
+.notification-badge {
+    background-color: var(--error-color);
+    color: white;
+}
+
+/* Search Bar */
+.search-bar {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+}
+
+.search-bar:focus {
+    border-color: var(--accent-primary);
+}
+
+/* Pagination */
+.pagination button {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.pagination button:hover {
+    background-color: var(--hover-bg);
+}
+
+.pagination button.active {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+/* Filter Panel */
+.filter-panel {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+.filter-panel h3 {
+    color: var(--text-primary);
+}
+
+/* Empty State */
+.empty-state {
+    color: var(--text-tertiary);
+}
+
+/* Divider */
+hr {
+    border-color: var(--border-color);
+}
+
+/* Blockquote */
+blockquote {
+    border-left-color: var(--accent-primary);
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+/* Keyboard Shortcuts */
+kbd {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Mark/Highlight */
+mark {
+    background-color: var(--warning-color);
+    color: var(--text-primary);
+}
+
+/* Selection */
+::selection {
+    background-color: var(--accent-primary);
+    color: white;
+}

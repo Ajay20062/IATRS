@@ -12,11 +12,44 @@
   margin-bottom: 1rem;
 }
 
+.head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .head-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-bottom: 1rem;
+}
+
+.summary-card {
+  border: 1px solid rgba(30, 58, 138, 0.1);
+  border-radius: 0.9rem;
+  background: linear-gradient(165deg, rgba(30, 64, 175, 0.06), rgba(255, 255, 255, 0.85));
+  padding: 0.95rem 1rem;
+}
+
+.summary-label {
+  color: #64748b;
+  font-size: 0.82rem;
+  margin-bottom: 0.15rem;
+}
+
+.summary-value {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .section-card .card-body {
@@ -32,12 +65,38 @@
   font-size: 0.75rem;
 }
 
+.app-filter {
+  min-width: 170px;
+}
+
+.app-filter-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.app-filter-input {
+  min-width: 180px;
+}
+
 @media (max-width: 767.98px) {
+  .head-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .head-actions {
+    justify-content: space-between;
+  }
+
   .section-card .card-body {
     padding: 1rem 0.9rem;
   }
 
   .app-navbar .container {
     gap: 0.8rem;
+  }
+
+  .app-filter-wrap {
+    max-width: 100%;
   }
 }

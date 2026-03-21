@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/profile.css" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <div class="container pb-4">
+    <div id="notifications"></div>
+    <div class="row g-3">
+      <div class="col-lg-4">
+        <div class="card section-card h-100">
+          <div class="card-body">
+            <h5 class="mb-3">Profile Overview</h5>
+            <div class="text-center mb-3">
+              <img id="profileImagePreview" class="profile-avatar" alt="Profile image" />
+            </div>
+            <div class="small text-muted mb-2">Role: <span id="roleLabel">-</span></div>
+            <div class="small text-muted mb-2">Email: <span id="emailLabel">-</span></div>
+            <div class="small text-muted mb-3">Name: <span id="nameLabel">-</span></div>
+            <form id="imageUploadForm" class="mb-2">
+              <input class="form-control form-control-sm mb-2" id="profileImageInput" type="file" accept=".jpg,.jpeg,.png" required />
+              <button class="btn btn-outline-primary btn-sm w-100" type="submit">Upload Profile Image</button>
+            </form>
+            <div class="progress mt-3" role="progressbar">
+              <div id="completionBar" class="progress-bar bg-success" style="width: 0%">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="card section-card mb-3">
+          <div class="card-body">
+            <h5 class="mb-3">Update Profile</h5>
+            <form id="profileForm" class="row g-2">
+              <div class="col-md-6"><label for="fullName"></label><input class="form-control" id="fullName" placeholder="Full name" /></div>
+              <div class="col-md-6"><label for="phoneNumber"></label><input class="form-control" id="phoneNumber" placeholder="Phone number" /></div>
+              <div class="col-12"><label for="bio"></label><textarea class="form-control" id="bio" rows="2" placeholder="Bio"></textarea></div>
+              <div id="candidateFields" class="d-none row g-2 m-0 p-0">
+                <div class="col-md-4"><label for="skills"></label><input class="form-control" id="skills" placeholder="Skills (comma separated)" /></div>
+                <div class="col-md-4"><label for="education"></label><input class="form-control" id="education" placeholder="Education" /></div>
+                <div class="col-md-4"><label for="experience"></label><input class="form-control" id="experience" placeholder="Experience" /></div>
+              </div>
+              <div id="recruiterFields" class="d-none row g-2 m-0 p-0">
+                <div class="col-md-4"><label for="companyName"></label><input class="form-control" id="companyName" placeholder="Company name" /></div>
+                <div class="col-md-4"><label for="companyWebsite"></label><input class="form-control" id="companyWebsite" placeholder="Company website" /></div>
+                <div class="col-md-4"><label for="designation"></label><input class="form-control" id="designation" placeholder="Designation" /></div>
+              </div>
+              <div class="col-12"><button class="btn btn-primary" type="submit">Save Changes</button></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card section-card mb-3" id="resumeCard">
+          <div class="card-body">
+            <h5 class="mb-3">Resume</h5>
+            <form id="resumeUploadForm" class="row g-2 align-items-end">
+              <div class="col-md-8"><input class="form-control" id="resumeInput" type="file" accept=".pdf,.doc,.docx" required /></div>
+              <div class="col-md-4"><button class="btn btn-outline-primary w-100" type="submit">Upload Resume</button></div>
+            </form>
+            <button id="analyzeResumeBtn" class="btn btn-dark btn-sm mt-3" type="button">Analyze Resume</button>
+            <div id="resumeAnalysis" class="small text-muted mt-2"></div>
+          </div>
+        </div>
+
+        <div class="card section-card">
+          <div class="card-body">
+            <h5 class="mb-3">Profile Analytics</h5>
+            <div class="row text-center g-2">
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div id="applicationsCount" class="stat-value">0</div>
+                  <div class="stat-label">Applications</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div id="interviewsAttended" class="stat-value">0</div>
+                  <div class="stat-label">Interviews</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div id="resumeScore" class="stat-value">-</div>
+                  <div class="stat-label">Resume Score</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/app-common.js"></script>
+  <script src="./js/profile.js"></script>
+</body>
+</html>

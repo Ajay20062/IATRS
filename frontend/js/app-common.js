@@ -60,6 +60,9 @@
         : await response.text();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          ATS.logout();
+        }
         const message =
           (payload && payload.detail) ||
           (payload && payload.error) ||
@@ -74,6 +77,59 @@
     } finally {
       window.clearTimeout(timer);
     }
+  };
+
+  ATS.checkAuth = function checkAuth() {
+    const token = localStorage.getItem("ats_token");
+    if (!token) {
+      window.location.href = "./login.html";
+      return null;
+    }
+    return token;
+  };
+
+  ATS.logout = function logout() {
+    localStorage.removeItem("ats_token");
+    localStorage.removeItem("ats_role");
+    window.location.href = "./login.html";
+  };
+
+  ATS.renderNavbar = function renderNavbar(containerId = "navbar-placeholder") {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const role = localStorage.getItem("ats_role");
+    
+    let links = "";
+    if (role) {
+      links = `
+        <span class="badge bg-light text-dark me-2 border">${role.toUpperCase()}</span>
+        <a class="btn btn-outline-light btn-sm" href="./dashboard.html">Dashboard</a>
+        <a class="btn btn-outline-light btn-sm" href="./profile.html">Profile</a>
+        <button class="btn btn-outline-danger btn-sm" onclick="ATS.logout()">Logout</button>
+      `;
+    } else {
+      links = `
+        <a class="btn btn-outline-light btn-sm" href="./login.html">Login</a>
+        <a class="btn btn-light btn-sm" href="./signup.html">Sign Up</a>
+      `;
+    }
+
+    container.innerHTML = `
+      <nav class="navbar navbar-expand-lg app-navbar mb-4">
+        <div class="container">
+          <a class="navbar-brand fw-bold" href="./index.html">ATS Workspace</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <div class="d-flex gap-2 align-items-center">
+              ${links}
+            </div>
+          </div>
+        </div>
+      </nav>
+    `;
   };
 
   window.ATS = ATS;

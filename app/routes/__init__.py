@@ -1,1 +1,3 @@
-
+"""
+IATRS - API Routes Package
+"""

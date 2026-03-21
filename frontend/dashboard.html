@@ -9,24 +9,32 @@
   <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg app-navbar mb-4">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="./index.html">ATS Workspace</a>
-      <button class="btn btn-outline-danger btn-sm" onclick="logout()">Logout</button>
-    </div>
-  </nav>
+  <div id="navbar-placeholder"></div>
 
   <div class="container pb-4 dashboard-shell">
     <div id="notifications"></div>
     <div class="dashboard-head">
-      <h3 class="mb-2">Dashboard</h3>
-      <p class="text-muted mb-4">Role: <span id="roleLabel"></span></p>
+      <div class="head-row">
+        <div>
+          <h3 class="mb-2">Dashboard</h3>
+          <p class="text-muted mb-3">Role: <span id="roleLabel"></span></p>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-outline-primary btn-sm" id="refreshBtn" type="button">Refresh</button>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" id="autoRefreshToggle">
+            <label class="form-check-label small text-muted" for="autoRefreshToggle">Auto refresh</label>
+          </div>
+        </div>
+      </div>
       <div class="head-chips">
         <span class="chip">Hiring velocity board</span>
         <span class="chip">Live application updates</span>
         <span class="chip">Interview orchestration</span>
       </div>
     </div>
+
+    <div class="row g-3 mb-3" id="summaryCards"></div>
 
     <div id="candidateSection" class="d-none">
       <div class="card section-card mb-3">
@@ -52,7 +60,17 @@
 
       <div class="card section-card mb-3">
         <div class="card-body">
-          <h5>My Applications</h5>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <h5 class="mb-0">My Applications</h5>
+            <select class="form-select form-select-sm app-filter" id="candidateAppStatusFilter">
+              <option value="all">All statuses</option>
+              <option value="Applied">Applied</option>
+              <option value="Screening">Screening</option>
+              <option value="Interviewing">Interviewing</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Hired">Hired</option>
+            </select>
+          </div>
           <div class="table-responsive">
             <table class="table table-striped" id="appsTable"></table>
           </div>
@@ -72,6 +90,15 @@
     <div id="recruiterSection" class="d-none">
       <div class="card section-card mb-3">
         <div class="card-body">
+          <h5>My Jobs</h5>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle" id="recruiterJobsTable"></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section-card mb-3">
+        <div class="card-body">
           <h5>Post New Job</h5>
           <form id="jobForm" class="row g-2">
             <div class="col-md-3"><input class="form-control" id="jobTitle" placeholder="Title" required /></div>
@@ -89,7 +116,20 @@
 
       <div class="card section-card mb-3">
         <div class="card-body">
-          <h5>Applications</h5>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <h5 class="mb-0">Applications</h5>
+            <div class="d-flex gap-2 app-filter-wrap">
+              <input class="form-control form-control-sm app-filter-input" id="recruiterAppSearch" placeholder="Search candidate/job">
+              <select class="form-select form-select-sm app-filter" id="recruiterAppStatusFilter">
+                <option value="all">All statuses</option>
+                <option value="Applied">Applied</option>
+                <option value="Screening">Screening</option>
+                <option value="Interviewing">Interviewing</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Hired">Hired</option>
+              </select>
+            </div>
+          </div>
           <div class="table-responsive">
             <table class="table table-striped align-middle" id="recruiterAppsTable"></table>
           </div>
