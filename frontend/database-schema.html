@@ -288,6 +288,21 @@
         </div>
     </main>
 
+    <!-- Table Detail Modal -->
+    <div id="tableModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] flex flex-col transform transition-all duration-300 scale-95" id="modalContentWrapper">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-lg">
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <span id="modalTitle" class="capitalize">Table Details</span>
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors text-4xl leading-none focus:outline-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-auto flex-1 bg-white relative" id="modalBody">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const CANDIDATE_API_BASES = (() => {
             if (window.location.protocol === "file:") {
@@ -460,8 +475,201 @@
             `;
         }
 
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadDatabaseStats);
+        // Modal Logic
+        function closeModal() {
+            const modal = document.getElementById('tableModal');
+            const content = document.getElementById('modalContentWrapper');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 150);
+        }
+
+        async function openTable(tableName) {
+            const modal = document.getElementById('tableModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const content = document.getElementById('modalContentWrapper');
+            
+            modal.classList.remove('hidden');
+            // Trigger animation
+            requestAnimationFrame(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            });
+            document.body.style.overflow = 'hidden';
+            
+            const displayTitle = tableName.charAt(0).toUpperCase() + tableName.slice(1);
+            modalTitle.textContent = `${displayTitle} Table`;
+            
+            modalBody.innerHTML = `
+                <div class="flex flex-col justify-center items-center h-64">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="text-gray-500">Fetching schema and data...</div>
+                </div>
+            `;
+
+            try {
+                // Ensure API base is resolved if not already
+                if (!API_URL) await resolveApiBase();
+                
+                const response = await fetchWithTimeout(`${API_URL}/stats/table/${tableName}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                renderTableDetails(data, tableName);
+            } catch (error) {
+                modalBody.innerHTML = `
+                    <div class="text-center text-red-600 py-12">
+                        <div class="text-5xl mb-4">⚠️</div>
+                        <h3 class="text-xl font-bold mb-2">Failed to load table data</h3>
+                        <p class="text-gray-600 mb-4">${error.message}</p>
+                        <div class="text-sm bg-red-50 inline-block px-4 py-2 rounded text-red-800 border border-red-200">
+                            Check if the backend is running and supports the /stats/table endpoint.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTableDetails(data, tableName) {
+            const modalBody = document.getElementById('modalBody');
+            const { columns, rows } = data;
+
+            // Schema Section
+            let html = `
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4 border-b pb-2">
+                        <h4 class="text-lg font-bold text-gray-700 flex items-center gap-2">
+                            <span class="text-blue-500">1.</span> Schema Definition
+                        </h4>
+                        <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-500">${columns.length} columns</span>
+                    </div>
+                    <div class="overflow-x-auto bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100 text-gray-600 uppercase font-bold text-xs tracking-wider">
+                                <tr>
+                                    <th class="px-5 py-3">Column</th>
+                                    <th class="px-5 py-3">Type</th>
+                                    <th class="px-5 py-3">Attributes</th>
+                                    <th class="px-5 py-3">Key</th>
+                                    <th class="px-5 py-3">Relations</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                ${columns.map(col => `
+                                    <tr class="hover:bg-blue-50 transition-colors">
+                                        <td class="px-5 py-3 font-mono font-medium text-blue-700">${col.name}</td>
+                                        <td class="px-5 py-3 text-gray-600 font-mono text-xs">${col.type}</td>
+                                        <td class="px-5 py-3">
+                                            ${!col.nullable 
+                                                ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">NOT NULL</span>' 
+                                                : '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">NULL</span>'}
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            ${col.primary_key ? '<span class="text-yellow-600 font-bold flex items-center gap-1">🔑 PK</span>' : ''}
+                                            ${col.foreign_keys.length > 0 ? '<span class="text-blue-600 font-bold flex items-center gap-1">🔗 FK</span>' : ''}
+                                        </td>
+                                        <td class="px-5 py-3 text-xs text-gray-500 font-mono">
+                                            ${col.foreign_keys.length > 0 ? `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100">Ref: ${col.foreign_keys.join(', ')}</span>` : '-'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Data Section
+            html += `
+                <div>
+                    <div class="flex items-center justify-between mb-4 border-b pb-2">
+                        <h4 class="text-lg font-bold text-gray-700 flex items-center gap-2">
+                            <span class="text-green-500">2.</span> Live Data Preview
+                        </h4>
+                        <span class="text-xs font-normal text-gray-500 bg-yellow-50 text-yellow-800 px-2 py-1 rounded border border-yellow-200">Top 50 rows</span>
+                    </div>
+                    ${rows.length === 0 ? `
+                        <div class="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-500">
+                            <div class="text-4xl mb-2">📭</div>
+                            <p>This table is currently empty.</p>
+                        </div>
+                    ` : `
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm max-h-[500px] custom-scrollbar">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-gray-800 text-gray-100 sticky top-0 shadow-md z-10">
+                                    <tr>
+                                        ${columns.map(col => `<th class="px-5 py-3 font-semibold tracking-wide">${col.name}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    ${rows.map((row, idx) => `
+                                        <tr class="hover:bg-blue-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                            ${columns.map(col => {
+                                                const val = row[col.name];
+                                                let displayVal = val;
+                                                let cellClass = "text-gray-700";
+                                                
+                                                if (val === null) {
+                                                    displayVal = 'NULL';
+                                                    cellClass = "text-gray-400 italic font-mono text-xs";
+                                                } else if (typeof val === 'boolean') {
+                                                    displayVal = val ? 'TRUE' : 'FALSE';
+                                                    cellClass = val ? "text-green-600 font-bold" : "text-red-600 font-bold";
+                                                } else if (col.name.includes('password')) {
+                                                    displayVal = '••••••••'; 
+                                                    cellClass = "text-gray-400 tracking-widest";
+                                                }
+                                                
+                                                return `<td class="px-5 py-3 ${cellClass} max-w-xs truncate" title="${String(val)}">${displayVal}</td>`;
+                                            }).join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-right text-xs text-gray-400">
+                            Showing ${rows.length} record(s)
+                        </div>
+                    `}
+                </div>
+            `;
+
+            modalBody.innerHTML = html;
+        }
+
+        // Attach listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDatabaseStats();
+            
+            // Add click handlers to cards
+            const cards = document.querySelectorAll('.table-card');
+            cards.forEach(card => {
+                // Find title
+                const titleEl = card.querySelector('h3');
+                if (titleEl) {
+                    const titleText = titleEl.textContent.trim().split(' ')[1] || titleEl.textContent.trim(); // Handle emoji prefix if present
+                    const tableName = titleText.toLowerCase();
+                    
+                    card.style.cursor = 'pointer';
+                    card.classList.add('hover:shadow-xl', 'transition-all', 'transform', 'hover:-translate-y-1');
+                    card.setAttribute('title', `Click to view ${titleText} data`);
+                    card.onclick = () => openTable(tableName);
+                }
+            });
+
+            // Close modal on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+            
+            // Close modal on outside click
+            document.getElementById('tableModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeModal();
+            });
+        });
     </script>
 </body>
 </html>
