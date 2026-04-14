@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
+import os
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from mysql.connector import IntegrityError
@@ -6,7 +7,8 @@ import re
 from db_connect import get_db_connection
 
 # Initialize Flask app
-app = Flask(__name__)
+# Pointing static_folder to 'frontend' and setting it as the directory to serve from
+app = Flask(__name__, static_folder='frontend', static_url_path='')
 
 # Enable CORS for all routes
 CORS(app)
@@ -496,13 +498,15 @@ def login_with_role():
 
 @app.route('/')
 def index():
-    """
-    Test route to verify the API is running.
-    
-    Returns:
-        JSON response with success message
-    """
-    return jsonify({'message': 'ATS API is running successfully!'})
+    """Serve the index.html from the frontend folder."""
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve other static files like CSS, JS, and HTML."""
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/jobs', methods=['GET'])
 def get_jobs():
