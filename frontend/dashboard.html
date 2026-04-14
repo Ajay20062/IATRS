@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard - Smart ATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold mb-8">Smart ATS</h1>
+                <nav class="space-y-2">
+                    <a href="#" class="flex items-center px-4 py-3 bg-blue-700 rounded-lg">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Applications
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Jobs
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Candidates
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Analytics
+                    </a>
+                </nav>
+            </div>
+            
+            <div class="absolute bottom-0 w-64 p-6 border-t border-blue-700">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-sm font-semibold">HR</span>
+                    </div>
+                    <div class="ml-3">
+                        <p id="recruiterName" class="text-sm font-medium">Recruiter</p>
+                        <p id="recruiterEmail" class="text-xs text-blue-300"></p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="px-8 py-6 flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Applications Dashboard</h2>
+                        <p class="text-gray-600 mt-1">Review and manage candidate applications</p>
+                    </div>
+                    <button
+                        id="postJobButton"
+                        type="button"
+                        class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                    >
+                        Post New Job
+                    </button>
+                    <button
+                        id="logoutBtn"
+                        type="button"
+                        class="inline-flex items-center bg-slate-700 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                    >
+                        Logout
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="p-8">
+                <div id="jobPostMessage" class="hidden mb-6 px-4 py-3 rounded-lg border"></div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Applications</p>
+                                <p id="totalApps" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Applied</p>
+                                <p id="appliedCount" class="text-2xl font-bold text-blue-600">0</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Hired</p>
+                                <p id="hiredCount" class="text-2xl font-bold text-green-600">0</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Rejected</p>
+                                <p id="rejectedCount" class="text-2xl font-bold text-red-600">0</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">All Applications</h3>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="loadingState" class="text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        <p class="mt-4 text-gray-600">Loading applications...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="errorState" class="hidden text-center py-12">
+                        <div class="text-red-600 text-xl mb-2">⚠️ Error Loading Applications</div>
+                        <p class="text-gray-600">Please make sure the backend server is running.</p>
+                    </div>
+
+                    <!-- Table -->
+                    <div id="tableContainer" class="hidden overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Candidate Name
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Job Role
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Applied Date
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Match Score
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden text-center py-12">
+                        <p class="text-gray-500">No applications found.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Post Job Modal -->
+    <div id="postJobModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-lg rounded-xl bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+                <h3 class="text-lg font-semibold text-gray-800">Post New Job</h3>
+                <button id="closeJobModalButton" type="button" class="text-gray-500 hover:text-gray-700 text-xl leading-none">&times;</button>
+            </div>
+
+            <form id="postJobForm" class="px-6 py-5 space-y-4">
+                <div>
+                    <label for="jobTitle" class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+                    <input id="jobTitle" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div>
+                    <label for="jobDepartment" class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                    <input id="jobDepartment" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div>
+                    <label for="jobLocation" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input id="jobLocation" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button id="cancelJobModalButton" type="button" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button id="submitJobButton" type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_URL = 'http://127.0.0.1:5001';
+        let currentUser = null;
+
+        // Load applications when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureRecruiterSession()) {
+                return;
+            }
+
+            document.getElementById('postJobButton').addEventListener('click', showPostJobModal);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('closeJobModalButton').addEventListener('click', hidePostJobModal);
+            document.getElementById('cancelJobModalButton').addEventListener('click', hidePostJobModal);
+            document.getElementById('postJobForm').addEventListener('submit', handlePostJobSubmit);
+            document.getElementById('postJobModal').addEventListener('click', function(event) {
+                if (event.target.id === 'postJobModal') {
+                    hidePostJobModal();
+                }
+            });
+
+            loadApplications();
+        });
+
+        function ensureRecruiterSession() {
+            try {
+                currentUser = JSON.parse(localStorage.getItem('user'));
+            } catch (error) {
+                currentUser = null;
+            }
+
+            if (!currentUser || currentUser.role !== 'recruiter') {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            if (!currentUser.recruiter_id && currentUser.id) {
+                currentUser.recruiter_id = currentUser.id;
+            }
+
+            if (!currentUser.recruiter_id) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            document.getElementById('recruiterName').textContent = currentUser.full_name || 'Recruiter';
+            document.getElementById('recruiterEmail').textContent = currentUser.email || '';
+            return true;
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function showPostJobModal() {
+            document.getElementById('postJobModal').classList.remove('hidden');
+        }
+
+        function hidePostJobModal() {
+            document.getElementById('postJobModal').classList.add('hidden');
+        }
+
+        function showJobPostMessage(message, type = 'success') {
+            const messageElement = document.getElementById('jobPostMessage');
+
+            messageElement.textContent = message;
+            messageElement.className = `mb-6 px-4 py-3 rounded-lg border ${type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`;
+        }
+
+        async function handlePostJobSubmit(event) {
+            event.preventDefault();
+
+            if (!currentUser || !currentUser.recruiter_id) {
+                showJobPostMessage('Please sign in as a recruiter to post jobs.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const submitButton = document.getElementById('submitJobButton');
+            const form = document.getElementById('postJobForm');
+            const payload = {
+                title: document.getElementById('jobTitle').value.trim(),
+                department: document.getElementById('jobDepartment').value.trim(),
+                location: document.getElementById('jobLocation').value.trim(),
+                recruiter_id: currentUser.recruiter_id
+            };
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Posting...';
+
+            try {
+                const response = await fetch(`${API_URL}/jobs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Failed to post job');
+                }
+
+                form.reset();
+                hidePostJobModal();
+                showJobPostMessage('Job posted successfully!', 'success');
+                window.location.reload();
+            } catch (error) {
+                console.error('Error posting job:', error);
+                showJobPostMessage(error.message || 'Could not post job. Please try again.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Post Job';
+            }
+        }
+
+        // Fetch and display applications
+        async function loadApplications() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const tableContainer = document.getElementById('tableContainer');
+            const emptyState = document.getElementById('emptyState');
+            const tableBody = document.getElementById('applicationsTableBody');
+
+            try {
+                const response = await fetch(`${API_URL}/applications`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch applications');
+                }
+
+                const applications = await response.json();
+                
+                // Hide loading state
+                loadingState.classList.add('hidden');
+
+                // Check if there are applications
+                if (applications.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                // Show table
+                tableContainer.classList.remove('hidden');
+
+                // Clear table body
+                tableBody.innerHTML = '';
+
+                // Populate table with applications
+                applications.forEach(app => {
+                    const row = createApplicationRow(app);
+                    tableBody.appendChild(row);
+                });
+
+                // Update stats
+                updateStats(applications);
+
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            }
+        }
+
+        // Create application table row
+        function createApplicationRow(app) {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition-colors';
+
+            const statusOptions = ['Applied', 'Screening', 'Interviewing', 'Rejected', 'Hired']
+                .map(status => `<option value="${status}" ${app.status === status ? 'selected' : ''}>${status}</option>`)
+                .join('');
+            
+            // Generate a match score (between 60-98) for demonstration
+            const matchScore = Math.floor(Math.random() * 38) + 60;
+            
+            // Format date
+            const appliedDate = new Date(app.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span class="text-blue-600 font-semibold text-sm">${app.candidate_name.charAt(0)}</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${app.candidate_name}</div>
+                            <div class="text-sm text-gray-500">${app.candidate_email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${app.job_title}</div>
+                    <div class="text-sm text-gray-500">${app.department}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${appliedDate}</div>
+                    <div class="text-xs text-gray-500">${app.location}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <select
+                        onchange="updateStatus(${app.application_id}, this.value)"
+                        class="text-sm border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        ${statusOptions}
+                    </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-1 mr-3">
+                            <div class="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="absolute h-full ${getScoreColor(matchScore)} transition-all duration-500" style="width: ${matchScore}%"></div>
+                            </div>
+                        </div>
+                        <span class="text-sm font-semibold ${getScoreTextColor(matchScore)}">${matchScore}%</span>
+                    </div>
+                </td>
+            `;
+            
+            return row;
+        }
+
+        // Update application status
+        async function updateStatus(appId, newStatus) {
+            try {
+                const response = await fetch(`${API_URL}/applications/${appId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update application status');
+                }
+
+                await loadApplications();
+            } catch (error) {
+                console.error('Error updating application status:', error);
+            }
+        }
+
+        // Get score color for progress bar
+        function getScoreColor(score) {
+            if (score >= 85) return 'bg-green-500';
+            if (score >= 70) return 'bg-blue-500';
+            if (score >= 60) return 'bg-yellow-500';
+            return 'bg-red-500';
+        }
+
+        // Get score text color
+        function getScoreTextColor(score) {
+            if (score >= 85) return 'text-green-600';
+            if (score >= 70) return 'text-blue-600';
+            if (score >= 60) return 'text-yellow-600';
+            return 'text-red-600';
+        }
+
+        // Update statistics
+        function updateStats(applications) {
+            const total = applications.length;
+            const applied = applications.filter(app => app.status === 'Applied').length;
+            const hired = applications.filter(app => app.status === 'Hired').length;
+            const rejected = applications.filter(app => app.status === 'Rejected').length;
+
+            document.getElementById('totalApps').textContent = total;
+            document.getElementById('appliedCount').textContent = applied;
+            document.getElementById('hiredCount').textContent = hired;
+            document.getElementById('rejectedCount').textContent = rejected;
+        }
+    </script>
+</body>
+</html>

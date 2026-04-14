@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ATS - Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-6">
+            <h1 class="text-2xl font-bold">Create Your Account</h1>
+            <p class="text-blue-100 mt-1 text-sm">Join Smart ATS as a candidate or recruiter</p>
+        </div>
+
+        <div id="messageBox" class="hidden mx-6 mt-5 px-4 py-3 rounded-lg border text-sm"></div>
+
+        <form id="registerForm" class="px-6 py-6 space-y-4">
+            <div>
+                <label for="role" class="block text-sm font-medium text-slate-700 mb-1">Register As</label>
+                <select id="role" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="candidate">Candidate Registration</option>
+                    <option value="recruiter">Recruiter Registration</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <input id="fullName" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input id="email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div id="phoneGroup">
+                <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                <input id="phone" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div id="companyGroup" class="hidden">
+                <label for="company" class="block text-sm font-medium text-slate-700 mb-1">Company</label>
+                <input id="company" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <input id="password" type="password" required minlength="8" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p class="text-xs text-slate-500 mt-1">Use at least 8 characters.</p>
+            </div>
+
+            <button id="registerButton" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">
+                Register
+            </button>
+        </form>
+
+        <div class="px-6 pb-6 text-sm text-slate-600">
+            Already have an account?
+            <a href="login.html" class="text-blue-700 font-semibold hover:underline">Go to login</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5001';
+
+        const roleField = document.getElementById('role');
+        roleField.addEventListener('change', toggleRoleFields);
+        toggleRoleFields();
+
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const registerButton = document.getElementById('registerButton');
+            const role = roleField.value;
+
+            const endpoint = role === 'candidate' ? '/register/candidate' : '/register/recruiter';
+            const payload = {
+                full_name: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            if (role === 'candidate') {
+                payload.phone = document.getElementById('phone').value.trim();
+            } else {
+                payload.company = document.getElementById('company').value.trim();
+            }
+
+            showMessage('', 'error', true);
+            registerButton.disabled = true;
+            registerButton.textContent = 'Registering...';
+
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || 'Registration failed');
+                }
+
+                showMessage('Registration successful. Redirecting to login...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 600);
+            } catch (error) {
+                showMessage(error.message || 'Unable to register right now.');
+            } finally {
+                registerButton.disabled = false;
+                registerButton.textContent = 'Register';
+            }
+        });
+
+        function toggleRoleFields() {
+            const isCandidate = roleField.value === 'candidate';
+            document.getElementById('phoneGroup').classList.toggle('hidden', !isCandidate);
+            document.getElementById('companyGroup').classList.toggle('hidden', isCandidate);
+        }
+
+        function showMessage(message, type = 'error', hide = false) {
+            const messageBox = document.getElementById('messageBox');
+
+            if (hide) {
+                messageBox.className = 'hidden mx-6 mt-5 px-4 py-3 rounded-lg border text-sm';
+                messageBox.textContent = '';
+                return;
+            }
+
+            messageBox.textContent = message;
+            messageBox.className = `mx-6 mt-5 px-4 py-3 rounded-lg border text-sm ${type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+        }
+    </script>
+</body>
+</html>

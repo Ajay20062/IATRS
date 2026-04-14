@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - Smart ATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-8 flex items-start justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-bold">My Applications</h1>
+                <p class="mt-2 text-blue-100">Track your current application statuses</p>
+            </div>
+            <div class="text-right">
+                <p id="candidateName" class="text-sm font-semibold"></p>
+                <p id="candidateEmail" class="text-xs text-blue-100"></p>
+                <div class="mt-2 flex gap-2 justify-end">
+                    <a href="index.html" class="bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">Back to Jobs</a>
+                    <button id="logoutBtn" type="button" class="bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-10">
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Application History</h2>
+            </div>
+
+            <div id="loadingState" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600">Loading your applications...</p>
+            </div>
+
+            <div id="errorState" class="hidden text-center py-12">
+                <div class="text-red-600 text-xl mb-2">⚠️ Error Loading Applications</div>
+                <p class="text-gray-600">Please make sure the backend server is running.</p>
+            </div>
+
+            <div id="emptyState" class="hidden text-center py-12">
+                <p class="text-gray-500">You have not applied to any jobs yet.</p>
+                <a href="index.html" class="mt-4 inline-block text-blue-700 font-semibold hover:underline">Browse open jobs</a>
+            </div>
+
+            <div id="tableContainer" class="hidden overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5001';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureCandidateSession()) {
+                return;
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            loadMyApplications();
+        });
+
+        function ensureCandidateSession() {
+            try {
+                currentUser = JSON.parse(localStorage.getItem('user'));
+            } catch (error) {
+                currentUser = null;
+            }
+
+            if (!currentUser || currentUser.role !== 'candidate') {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            if (!currentUser.candidate_id && currentUser.id) {
+                currentUser.candidate_id = currentUser.id;
+            }
+
+            if (!currentUser.candidate_id) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            document.getElementById('candidateName').textContent = currentUser.full_name || 'Candidate';
+            document.getElementById('candidateEmail').textContent = currentUser.email || '';
+            return true;
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        async function loadMyApplications() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
+            const tableBody = document.getElementById('applicationsTableBody');
+
+            try {
+                const response = await fetch(`${API_URL}/applications/candidate/${currentUser.candidate_id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch candidate applications');
+                }
+
+                const applications = await response.json();
+                loadingState.classList.add('hidden');
+
+                if (!applications.length) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                tableContainer.classList.remove('hidden');
+                tableBody.innerHTML = '';
+
+                applications.forEach(app => {
+                    const row = document.createElement('tr');
+                    const appliedDate = new Date(app.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${app.job_title}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${app.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${app.location}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyle(app.status)}">${app.status}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${appliedDate}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading candidate applications:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            }
+        }
+
+        function getStatusStyle(status) {
+            switch (status) {
+                case 'Hired':
+                    return 'bg-green-100 text-green-800';
+                case 'Rejected':
+                    return 'bg-red-100 text-red-800';
+                case 'Interviewing':
+                    return 'bg-purple-100 text-purple-800';
+                case 'Screening':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'Applied':
+                    return 'bg-blue-100 text-blue-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+    </script>
+</body>
+</html>

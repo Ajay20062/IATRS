@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ATS - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100">
+    <main class="min-h-screen flex items-center justify-center px-4 py-10">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-6">
+                <h1 class="text-2xl font-bold">Smart ATS Access</h1>
+                <p class="text-blue-100 mt-1 text-sm">Sign in or create your account</p>
+            </div>
+
+            <div class="px-6 pt-5 pb-2">
+                <div class="grid grid-cols-2 gap-2 bg-slate-100 rounded-lg p-1">
+                    <button id="loginModeBtn" type="button" class="px-3 py-2 rounded-md text-sm font-semibold">Sign In</button>
+                    <button id="registerModeBtn" type="button" class="px-3 py-2 rounded-md text-sm font-semibold">Create Account</button>
+                </div>
+            </div>
+
+            <div id="authMessage" class="hidden mx-6 mt-4 px-4 py-3 rounded-lg border text-sm"></div>
+
+            <form id="authForm" class="px-6 py-5 space-y-4">
+                <div id="fullNameGroup" class="hidden">
+                    <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                    <input id="fullName" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div>
+                    <label for="role" class="block text-sm font-medium text-slate-700 mb-1">Account Type</label>
+                    <select id="role" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="candidate">Candidate</option>
+                        <option value="recruiter">Recruiter</option>
+                    </select>
+                </div>
+
+                <div id="phoneGroup" class="hidden">
+                    <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Phone (candidate)</label>
+                    <input id="phone" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div id="companyGroup" class="hidden">
+                    <label for="company" class="block text-sm font-medium text-slate-700 mb-1">Company (recruiter)</label>
+                    <input id="company" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input id="email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input id="password" type="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <p id="passwordHint" class="text-xs text-slate-500 mt-1 hidden">Use at least 8 characters.</p>
+                </div>
+
+                <button id="submitBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="px-6 pb-6 text-xs text-slate-500">
+                After login, candidates are redirected to the career portal and recruiters to the dashboard.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5001';
+        let mode = 'login';
+
+        const form = document.getElementById('authForm');
+        const roleField = document.getElementById('role');
+        const messageBox = document.getElementById('authMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const fullNameGroup = document.getElementById('fullNameGroup');
+        const phoneGroup = document.getElementById('phoneGroup');
+        const companyGroup = document.getElementById('companyGroup');
+        const passwordHint = document.getElementById('passwordHint');
+
+        document.getElementById('loginModeBtn').addEventListener('click', () => setMode('login'));
+        document.getElementById('registerModeBtn').addEventListener('click', () => setMode('register'));
+        roleField.addEventListener('change', updateRoleSpecificFields);
+        form.addEventListener('submit', handleSubmit);
+
+        initializeFromQuery();
+        updateRoleSpecificFields();
+
+        function initializeFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const requestedRole = params.get('role');
+            const requestedMode = params.get('mode');
+
+            if (requestedRole === 'candidate' || requestedRole === 'recruiter') {
+                roleField.value = requestedRole;
+            }
+
+            if (requestedMode === 'register') {
+                setMode('register');
+            } else {
+                setMode('login');
+            }
+        }
+
+        function setMode(nextMode) {
+            mode = nextMode;
+            const isRegister = mode === 'register';
+
+            fullNameGroup.classList.toggle('hidden', !isRegister);
+            passwordHint.classList.toggle('hidden', !isRegister);
+
+            document.getElementById('loginModeBtn').className = `px-3 py-2 rounded-md text-sm font-semibold ${!isRegister ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600'}`;
+            document.getElementById('registerModeBtn').className = `px-3 py-2 rounded-md text-sm font-semibold ${isRegister ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600'}`;
+
+            submitBtn.textContent = isRegister ? 'Create Account' : 'Sign In';
+            clearMessage();
+            updateRoleSpecificFields();
+        }
+
+        function updateRoleSpecificFields() {
+            const isRegister = mode === 'register';
+            const isCandidate = roleField.value === 'candidate';
+
+            phoneGroup.classList.toggle('hidden', !(isRegister && isCandidate));
+            companyGroup.classList.toggle('hidden', !(isRegister && !isCandidate));
+        }
+
+        function showMessage(text, type = 'error') {
+            messageBox.textContent = text;
+            messageBox.className = `mx-6 mt-4 px-4 py-3 rounded-lg border text-sm ${type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+        }
+
+        function clearMessage() {
+            messageBox.className = 'hidden mx-6 mt-4 px-4 py-3 rounded-lg border text-sm';
+            messageBox.textContent = '';
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            clearMessage();
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = mode === 'register' ? 'Creating...' : 'Signing in...';
+
+            try {
+                const payload = buildPayload();
+                const endpoint = mode === 'register' ? '/auth/register' : '/auth/login';
+
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseData = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Authentication failed');
+                }
+
+                localStorage.setItem('ats_current_user', JSON.stringify(responseData.user));
+                showMessage(responseData.message || 'Success', 'success');
+
+                setTimeout(() => {
+                    if (responseData.user.role === 'recruiter') {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 350);
+            } catch (error) {
+                showMessage(error.message || 'Something went wrong');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'register' ? 'Create Account' : 'Sign In';
+            }
+        }
+
+        function buildPayload() {
+            const role = roleField.value;
+            const basePayload = {
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            if (mode === 'login') {
+                return basePayload;
+            }
+
+            const payload = {
+                ...basePayload,
+                full_name: document.getElementById('fullName').value.trim(),
+                role
+            };
+
+            if (role === 'candidate') {
+                payload.phone = document.getElementById('phone').value.trim();
+            } else {
+                payload.company = document.getElementById('company').value.trim();
+            }
+
+            return payload;
+        }
+    </script>
+</body>
+</html>
