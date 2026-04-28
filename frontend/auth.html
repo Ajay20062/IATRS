@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ATS - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+        .btn-gradient:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4 py-6">
+    <div class="w-full max-w-md">
+        <div class="glass-card rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-8 text-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mx-auto mb-3 flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-white">Smart ATS</h1>
+                <p class="text-slate-400 text-sm mt-1">Intelligent Recruitment Platform</p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="px-6 pt-5">
+                <div class="flex bg-slate-100 rounded-xl p-1">
+                    <button id="loginModeBtn" type="button" class="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-white shadow-sm text-slate-900">
+                        Sign In
+                    </button>
+                    <button id="registerModeBtn" type="button" class="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500">
+                        Create Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Message Box -->
+            <div id="authMessage" class="hidden mx-6 mt-4 px-4 py-3 rounded-xl border text-sm font-medium"></div>
+
+            <!-- Form -->
+            <form id="authForm" class="px-6 py-5 space-y-4">
+                <!-- Full Name (Register only) -->
+                <div id="fullNameGroup" class="hidden">
+                    <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+                    <input id="fullName" type="text" placeholder="Enter your full name"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <!-- Role Selection -->
+                <div>
+                    <label for="role" class="block text-sm font-medium text-slate-700 mb-1.5">Account Type</label>
+                    <select id="role" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none bg-white">
+                        <option value="candidate">Candidate - Apply for jobs</option>
+                        <option value="recruiter">Recruiter - Post & manage jobs</option>
+                    </select>
+                </div>
+
+                <!-- Phone (Candidate only, Register only) -->
+                <div id="phoneGroup" class="hidden">
+                    <label for="phone" class="block text-sm font-medium text-slate-700 mb-1.5">Phone Number</label>
+                    <input id="phone" type="tel" placeholder="+1 (555) 123-4567"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <!-- Company (Recruiter only, Register only) -->
+                <div id="companyGroup" class="hidden">
+                    <label for="company" class="block text-sm font-medium text-slate-700 mb-1.5">Company Name</label>
+                    <input id="company" type="text" placeholder="Acme Corporation"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+                    <input id="email" type="email" required placeholder="you@company.com"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+                    <input id="password" type="password" required placeholder="••••••••"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                    <p id="passwordHint" class="hidden text-xs text-slate-500 mt-1.5">At least 8 characters</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="submitBtn" type="submit" class="w-full btn-gradient text-white font-semibold py-3 rounded-xl transition-all mt-2">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="px-6 pb-6 text-center">
+                <p class="text-xs text-slate-500">
+                    By continuing, you agree to our Terms of Service
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+        let mode = 'login';
+
+        const form = document.getElementById('authForm');
+        const roleField = document.getElementById('role');
+        const messageBox = document.getElementById('authMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const fullNameGroup = document.getElementById('fullNameGroup');
+        const phoneGroup = document.getElementById('phoneGroup');
+        const companyGroup = document.getElementById('companyGroup');
+        const passwordHint = document.getElementById('passwordHint');
+
+        document.getElementById('loginModeBtn').addEventListener('click', () => setMode('login'));
+        document.getElementById('registerModeBtn').addEventListener('click', () => setMode('register'));
+        roleField.addEventListener('change', updateRoleSpecificFields);
+        form.addEventListener('submit', handleSubmit);
+
+        initializeFromQuery();
+        updateRoleSpecificFields();
+
+        function initializeFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const requestedRole = params.get('role');
+            const requestedMode = params.get('mode');
+
+            if (requestedRole === 'candidate' || requestedRole === 'recruiter') {
+                roleField.value = requestedRole;
+            }
+
+            if (requestedMode === 'register') {
+                setMode('register');
+            } else {
+                setMode('login');
+            }
+        }
+
+        function setMode(nextMode) {
+            mode = nextMode;
+            const isRegister = mode === 'register';
+
+            fullNameGroup.classList.toggle('hidden', !isRegister);
+            passwordHint.classList.toggle('hidden', !isRegister);
+
+            document.getElementById('loginModeBtn').className = `flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${!isRegister ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`;
+            document.getElementById('registerModeBtn').className = `flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${isRegister ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`;
+
+            submitBtn.textContent = isRegister ? 'Create Account' : 'Sign In';
+            clearMessage();
+            updateRoleSpecificFields();
+        }
+
+        function updateRoleSpecificFields() {
+            const isRegister = mode === 'register';
+            const isCandidate = roleField.value === 'candidate';
+
+            phoneGroup.classList.toggle('hidden', !(isRegister && isCandidate));
+            companyGroup.classList.toggle('hidden', !(isRegister && !isCandidate));
+        }
+
+        function showMessage(text, type = 'error') {
+            messageBox.textContent = text;
+            if (type === 'success') {
+                messageBox.className = `mx-6 mt-4 px-4 py-3 rounded-xl border text-sm font-medium bg-emerald-50 border-emerald-200 text-emerald-800`;
+            } else {
+                messageBox.className = `mx-6 mt-4 px-4 py-3 rounded-xl border text-sm font-medium bg-red-50 border-red-200 text-red-800`;
+            }
+        }
+
+        function clearMessage() {
+            messageBox.className = 'hidden mx-6 mt-4 px-4 py-3 rounded-xl border text-sm font-medium';
+            messageBox.textContent = '';
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            clearMessage();
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = mode === 'register' ? 'Creating...' : 'Signing in...';
+
+            try {
+                const payload = buildPayload();
+                const endpoint = mode === 'register' ? '/auth/register' : '/auth/login';
+
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseData = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Authentication failed');
+                }
+
+                localStorage.setItem('user', JSON.stringify(responseData.user));
+                showMessage(responseData.message || 'Success! Redirecting...', 'success');
+
+                setTimeout(() => {
+                    if (responseData.user.role === 'recruiter') {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 500);
+            } catch (error) {
+                showMessage(error.message || 'Something went wrong');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'register' ? 'Create Account' : 'Sign In';
+            }
+        }
+
+        function buildPayload() {
+            const role = roleField.value;
+            const basePayload = {
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            if (mode === 'login') {
+                return basePayload;
+            }
+
+            const payload = {
+                ...basePayload,
+                full_name: document.getElementById('fullName').value.trim(),
+                role
+            };
+
+            if (role === 'candidate') {
+                payload.phone = document.getElementById('phone').value.trim();
+            } else {
+                payload.company = document.getElementById('company').value.trim();
+            }
+
+            return payload;
+        }
+    </script>
+</body>
+</html>

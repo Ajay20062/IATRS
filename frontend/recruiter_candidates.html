@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Candidates - Smart ATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+        .table-row:hover { background: linear-gradient(90deg, #f8fafc, #f1f5f9); }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex-shrink-0">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">Smart ATS</h1>
+                        <p class="text-xs text-slate-400">Recruiter Portal</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="font-medium">Applications</span>
+                    </a>
+                    <a href="recruiter_jobs.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span class="font-medium">Jobs</span>
+                    </a>
+                    <a href="recruiter_candidates.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span class="font-medium">Candidates</span>
+                    </a>
+                    <a href="recruiter_analytics.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <span class="font-medium">Analytics</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="absolute bottom-0 w-72 p-6 border-t border-slate-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                        <span id="userInitials" class="text-sm font-bold">HR</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p id="recruiterName" class="text-sm font-semibold truncate">Recruiter</p>
+                        <p id="recruiterEmail" class="text-xs text-slate-400 truncate"></p>
+                    </div>
+                    <button id="logoutBtn" class="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <header class="gradient-header text-white px-8 py-8">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold">Candidate Pipeline</h2>
+                        <p class="text-slate-300 mt-1">Candidates connected to your jobs</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800">Candidates</h3>
+                    </div>
+
+                    <div id="loadingState" class="text-center py-16">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="mt-4 text-slate-500">Loading candidates...</p>
+                    </div>
+
+                    <div id="errorState" class="hidden text-center py-16">
+                        <p class="text-red-600 font-medium">Error Loading Candidates</p>
+                    </div>
+
+                    <div id="emptyState" class="hidden text-center py-16">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <p class="text-slate-600 font-medium">No candidates found</p>
+                        <p class="text-slate-500 text-sm mt-1">Candidates will appear when they apply to your jobs.</p>
+                    </div>
+
+                    <div id="tableContainer" class="hidden overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Candidate</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Applications</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Latest Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidatesTableBody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureRecruiterSession()) return;
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            loadRecruiterCandidates();
+        });
+
+        function ensureRecruiterSession() {
+            try { currentUser = JSON.parse(localStorage.getItem('user')); } catch (error) { currentUser = null; }
+            if (!currentUser || currentUser.role !== 'recruiter') { window.location.href = 'login.html'; return false; }
+            if (!currentUser.recruiter_id && currentUser.id) currentUser.recruiter_id = currentUser.id;
+            if (!currentUser.recruiter_id) { window.location.href = 'login.html'; return false; }
+            const name = currentUser.full_name || 'Recruiter';
+            document.getElementById('recruiterName').textContent = name;
+            document.getElementById('recruiterEmail').textContent = currentUser.email || '';
+            document.getElementById('userInitials').textContent = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            return true;
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        async function loadRecruiterCandidates() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const tableContainer = document.getElementById('tableContainer');
+            const emptyState = document.getElementById('emptyState');
+            const tableBody = document.getElementById('candidatesTableBody');
+
+            try {
+                const response = await fetch(`${API_URL}/candidates/recruiter/${currentUser.recruiter_id}`);
+                if (!response.ok) throw new Error('Failed to fetch candidates');
+
+                const candidates = await response.json();
+                loadingState.classList.add('hidden');
+
+                if (!candidates.length) {
+                    emptyState.classList.remove('hidden');
+                    tableContainer.classList.add('hidden');
+                    return;
+                }
+
+                tableContainer.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                tableBody.innerHTML = '';
+
+                candidates.forEach(candidate => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row transition-colors';
+                    const latest = candidate.latest_application_at ? new Date(candidate.latest_application_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">${candidate.full_name.charAt(0)}</div>
+                                <span class="font-semibold text-slate-800">${candidate.full_name}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${candidate.email}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${candidate.phone || '-'}</td>
+                        <td class="px-6 py-4"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">${candidate.applications_count}</span></td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${latest}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading recruiter candidates:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

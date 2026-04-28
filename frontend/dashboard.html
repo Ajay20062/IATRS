@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard - Smart ATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+        }
+        .stat-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #475569, #64748b);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(71, 85, 105, 0.4);
+        }
+        .table-row:hover {
+            background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .status-applied { background: #dbeafe; color: #1d4ed8; }
+        .status-screening { background: #fef3c7; color: #b45309; }
+        .status-interviewing { background: #ede9fe; color: #7c3aed; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        .status-hired { background: #dcfce7; color: #16a34a; }
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .toast {
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex-shrink-0">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">Smart ATS</h1>
+                        <p class="text-xs text-slate-400">Recruiter Portal</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="font-medium">Applications</span>
+                    </a>
+                    <a href="recruiter_jobs.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span class="font-medium">Jobs</span>
+                    </a>
+                    <a href="recruiter_candidates.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span class="font-medium">Candidates</span>
+                    </a>
+                    <a href="recruiter_analytics.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <span class="font-medium">Analytics</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="absolute bottom-0 w-72 p-6 border-t border-slate-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                        <span id="userInitials" class="text-sm font-bold">HR</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p id="recruiterName" class="text-sm font-semibold truncate">Recruiter</p>
+                        <p id="recruiterEmail" class="text-xs text-slate-400 truncate"></p>
+                    </div>
+                    <button id="logoutBtn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Logout">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="gradient-header text-white px-8 py-8">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold">Applications Dashboard</h2>
+                        <p class="text-slate-300 mt-1">Review and manage candidate applications</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="postJobButton" type="button" class="btn-primary text-white font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Post New Job
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="p-8">
+                <!-- Messages -->
+                <div id="jobPostMessage" class="hidden mb-6 px-5 py-4 rounded-xl border font-medium"></div>
+                <div id="interviewMessage" class="hidden mb-6 px-5 py-4 rounded-xl border font-medium"></div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card rounded-2xl p-6 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Total Applications</p>
+                                <p id="totalApps" class="text-3xl font-bold text-slate-800 mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+                                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">New Applications</p>
+                                <p id="appliedCount" class="text-3xl font-bold text-blue-600 mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+                                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Hired</p>
+                                <p id="hiredCount" class="text-3xl font-bold text-emerald-600 mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-500 font-medium">Rejected</p>
+                                <p id="rejectedCount" class="text-3xl font-bold text-red-600 mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center">
+                                <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">All Applications</h3>
+                            <p class="text-sm text-slate-500 mt-0.5">Manage candidate applications for your posted jobs</p>
+                        </div>
+                        <div id="applicationCount" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">0 total</div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" class="text-center py-16">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="mt-4 text-slate-500">Loading applications...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="errorState" class="hidden text-center py-16">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <p class="text-slate-600 font-medium">Error Loading Applications</p>
+                        <p class="text-slate-500 text-sm mt-1">Please make sure the backend server is running.</p>
+                    </div>
+
+                    <!-- Table -->
+                    <div id="tableContainer" class="hidden overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Candidate</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Job Role</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Applied Date</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Rating</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody" class="divide-y divide-slate-200">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden text-center py-16">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                        </div>
+                        <p class="text-slate-600 font-medium">No applications yet</p>
+                        <p class="text-slate-500 text-sm mt-1">Applications will appear here when candidates apply.</p>
+                    </div>
+                </div>
+
+                <!-- Rating Legend -->
+                <div class="mt-4 flex items-center gap-6 text-sm text-slate-500">
+                    <span>Click ★ to rate candidate</span>
+                    <span>|</span>
+                    <span>Click status to change</span>
+                    <span>|</span>
+                    <span>Schedule appears after Screening</span>
+                </div>
+
+                <!-- Scheduled Interviews Section -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+                    <div class="px-6 py-5 border-b border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800">Scheduled Interviews</h3>
+                        <p class="text-sm text-slate-500 mt-0.5">Upcoming interviews with candidates</p>
+                    </div>
+
+                    <div id="interviewsLoadingState" class="text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                        <p class="mt-4 text-slate-500">Loading scheduled interviews...</p>
+                    </div>
+
+                    <div id="interviewsErrorState" class="hidden text-center py-12">
+                        <p class="text-red-600">Error Loading Scheduled Interviews</p>
+                    </div>
+
+                    <div id="interviewsEmptyState" class="hidden text-center py-12">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <p class="text-slate-500">No scheduled interviews for your jobs.</p>
+                    </div>
+
+                    <div id="interviewsTableContainer" class="hidden overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Candidate</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Job</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Scheduled At</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduledInterviewsTableBody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Post Job Modal -->
+    <div id="postJobModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-lg bg-white rounded-2xl shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Post New Job</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Create a new job posting</p>
+                </div>
+                <button id="closeJobModalButton" type="button" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="postJobForm" class="px-6 py-5 space-y-5">
+                <div>
+                    <label for="jobTitle" class="block text-sm font-semibold text-slate-700 mb-2">Job Title</label>
+                    <input id="jobTitle" type="text" required placeholder="e.g. Senior Software Engineer"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div>
+                    <label for="jobDepartment" class="block text-sm font-semibold text-slate-700 mb-2">Department</label>
+                    <input id="jobDepartment" type="text" required placeholder="e.g. Engineering"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div>
+                    <label for="jobLocation" class="block text-sm font-semibold text-slate-700 mb-2">Location</label>
+                    <input id="jobLocation" type="text" required placeholder="e.g. New York, Remote"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button id="cancelJobModalButton" type="button" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Cancel</button>
+                    <button id="submitJobButton" type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-white font-medium">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Schedule Interview Modal -->
+    <div id="scheduleInterviewModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-lg bg-white rounded-2xl shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Schedule Interview</h3>
+                    <p id="scheduleInterviewContext" class="text-sm text-slate-500 mt-0.5"></p>
+                </div>
+                <button id="closeInterviewModalButton" type="button" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="scheduleInterviewForm" class="px-6 py-5 space-y-5">
+                <div>
+                    <label for="interviewDateTime" class="block text-sm font-semibold text-slate-700 mb-2">Interview Date & Time</label>
+                    <input id="interviewDateTime" type="datetime-local" required
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <div>
+                    <label for="interviewType" class="block text-sm font-semibold text-slate-700 mb-2">Interview Type</label>
+                    <select id="interviewType" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                        <option value="Video">Video Call</option>
+                        <option value="Phone">Phone Call</option>
+                        <option value="Onsite">On-site</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button id="cancelInterviewModalButton" type="button" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Cancel</button>
+                    <button id="submitInterviewButton" type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-white font-medium">Schedule Interview</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Interview Feedback Modal -->
+    <div id="feedbackModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 sticky top-0 bg-white">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Interview Feedback</h3>
+                    <p id="feedbackContext" class="text-sm text-slate-500 mt-0.5"></p>
+                </div>
+                <button onclick="hideFeedbackModal()" type="button" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="feedbackForm" class="px-6 py-5 space-y-5">
+                <input type="hidden" id="feedbackInterviewId" value="">
+                <input type="hidden" id="feedbackApplicationId" value="">
+
+                <!-- Overall Rating -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Overall Rating *</label>
+                    <div id="starRating" class="flex gap-1">
+                        <button type="button" onclick="setRating(1)" class="text-3xl text-slate-300 hover:text-amber-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(2)" class="text-3xl text-slate-300 hover:text-amber-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(3)" class="text-3xl text-slate-300 hover:text-amber-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(4)" class="text-3xl text-slate-300 hover:text-amber-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(5)" class="text-3xl text-slate-300 hover:text-amber-400 transition-colors">★</button>
+                    </div>
+                    <input type="hidden" id="ratingValue" value="0">
+                </div>
+
+                <!-- Recommendation -->
+                <div>
+                    <label for="recommendation" class="block text-sm font-semibold text-slate-700 mb-2">Recommendation *</label>
+                    <select id="recommendation" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <option value="">Select recommendation...</option>
+                        <option value="Strong Hire">Strong Hire</option>
+                        <option value="Hire">Hire</option>
+                        <option value="No Hire">No Hire</option>
+                        <option value="Strong No Hire">Strong No Hire</option>
+                    </select>
+                </div>
+
+                <!-- Strengths -->
+                <div>
+                    <label for="strengths" class="block text-sm font-semibold text-slate-700 mb-2">Strengths</label>
+                    <textarea id="strengths" rows="2" placeholder="What did the candidate do well?" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                </div>
+
+                <!-- Concerns -->
+                <div>
+                    <label for="concerns" class="block text-sm font-semibold text-slate-700 mb-2">Concerns</label>
+                    <textarea id="concerns" rows="2" placeholder="Any areas of concern?" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                </div>
+
+                <!-- New Application Status -->
+                <div>
+                    <label for="newAppStatus" class="block text-sm font-semibold text-slate-700 mb-2">Update Application Status</label>
+                    <select id="newAppStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <option value="">Keep current status</option>
+                        <option value="Screening">Screening</option>
+                        <option value="Interviewing">Interviewing</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <!-- Additional Notes -->
+                <div>
+                    <label for="additionalNotes" class="block text-sm font-semibold text-slate-700 mb-2">Additional Notes</label>
+                    <textarea id="additionalNotes" rows="2" placeholder="Any other comments..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                </div>
+
+                <div id="feedbackMessage" class="hidden px-4 py-3 rounded-lg border text-sm"></div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="hideFeedbackModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Cancel</button>
+                    <button id="submitFeedbackButton" type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-white font-medium">Submit Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application History Modal -->
+    <div id="historyModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-lg bg-white rounded-2xl shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Application Status History</h3>
+                    <p id="historyContext" class="text-sm text-slate-500 mt-0.5"></p>
+                </div>
+                <button onclick="hideHistoryModal()" type="button" class="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div id="historyLoading" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+                <p class="mt-4 text-slate-500">Loading history...</p>
+            </div>
+
+            <div id="historyContent" class="hidden px-6 py-5">
+                <div id="historyTimeline" class="space-y-4"></div>
+            </div>
+
+            <div id="historyError" class="hidden text-center py-12">
+                <p class="text-red-600">Error loading history</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+        let currentUser = null;
+        let applicationsById = {};
+        let selectedApplicationId = null;
+        let currentRating = 0;
+        let appRatings = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureRecruiterSession()) return;
+
+            document.getElementById('postJobButton').addEventListener('click', showPostJobModal);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('closeJobModalButton').addEventListener('click', hidePostJobModal);
+            document.getElementById('cancelJobModalButton').addEventListener('click', hidePostJobModal);
+            document.getElementById('postJobForm').addEventListener('submit', handlePostJobSubmit);
+            document.getElementById('closeInterviewModalButton').addEventListener('click', hideScheduleInterviewModal);
+            document.getElementById('cancelInterviewModalButton').addEventListener('click', hideScheduleInterviewModal);
+            document.getElementById('scheduleInterviewForm').addEventListener('submit', handleScheduleInterviewSubmit);
+            document.getElementById('postJobModal').addEventListener('click', function(event) {
+                if (event.target.id === 'postJobModal') hidePostJobModal();
+            });
+            document.getElementById('scheduleInterviewModal').addEventListener('click', function(event) {
+                if (event.target.id === 'scheduleInterviewModal') hideScheduleInterviewModal();
+            });
+            document.getElementById('feedbackModal').addEventListener('click', function(event) {
+                if (event.target.id === 'feedbackModal') hideFeedbackModal();
+            });
+            document.getElementById('historyModal').addEventListener('click', function(event) {
+                if (event.target.id === 'historyModal') hideHistoryModal();
+            });
+            document.getElementById('feedbackForm').addEventListener('submit', handleFeedbackSubmit);
+
+            loadDashboardData();
+        });
+
+        function ensureRecruiterSession() {
+            try {
+                currentUser = JSON.parse(localStorage.getItem('user'));
+            } catch (error) {
+                currentUser = null;
+            }
+
+            if (!currentUser || currentUser.role !== 'recruiter') {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            if (!currentUser.recruiter_id && currentUser.id) {
+                currentUser.recruiter_id = currentUser.id;
+            }
+
+            if (!currentUser.recruiter_id) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            const name = currentUser.full_name || 'Recruiter';
+            document.getElementById('recruiterName').textContent = name;
+            document.getElementById('recruiterEmail').textContent = currentUser.email || '';
+            document.getElementById('userInitials').textContent = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            return true;
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('notificationContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast max-w-sm px-5 py-4 rounded-xl border shadow-lg ${type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function getApiErrorMessage(response, fallbackMessage) {
+            const payload = await response.json().catch(() => null);
+            if (payload && typeof payload.error === 'string' && payload.error.trim()) return payload.error;
+            if (payload && typeof payload.message === 'string' && payload.message.trim()) return payload.message;
+            return fallbackMessage;
+        }
+
+        function showPostJobModal() {
+            document.getElementById('postJobModal').classList.remove('hidden');
+        }
+
+        function hidePostJobModal() {
+            document.getElementById('postJobModal').classList.add('hidden');
+        }
+
+        function showJobPostMessage(message, type = 'success') {
+            const messageElement = document.getElementById('jobPostMessage');
+            messageElement.textContent = message;
+            messageElement.className = `mb-6 px-5 py-4 rounded-xl border font-medium ${type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+        }
+
+        function showInterviewMessage(message, type = 'success') {
+            const messageElement = document.getElementById('interviewMessage');
+            messageElement.textContent = message;
+            messageElement.className = `mb-6 px-5 py-4 rounded-xl border font-medium ${type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+        }
+
+        async function loadDashboardData() {
+            await Promise.all([loadApplications(), loadScheduledInterviews()]);
+        }
+
+        async function handlePostJobSubmit(event) {
+            event.preventDefault();
+
+            if (!currentUser || !currentUser.recruiter_id) {
+                showJobPostMessage('Please sign in as a recruiter to post jobs.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const submitButton = document.getElementById('submitJobButton');
+            const form = document.getElementById('postJobForm');
+            const payload = {
+                title: document.getElementById('jobTitle').value.trim(),
+                department: document.getElementById('jobDepartment').value.trim(),
+                location: document.getElementById('jobLocation').value.trim(),
+                recruiter_id: currentUser.recruiter_id
+            };
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Posting...';
+
+            try {
+                const response = await fetch(`${API_URL}/jobs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to post job'));
+                }
+
+                form.reset();
+                hidePostJobModal();
+                showJobPostMessage('Job posted successfully!', 'success');
+                showToast('Job posted successfully!', 'success');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error posting job:', error);
+                showJobPostMessage(error.message || 'Could not post job. Please try again.', 'error');
+                showToast(error.message || 'Could not post job.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Post Job';
+            }
+        }
+
+        async function loadApplications() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const tableContainer = document.getElementById('tableContainer');
+            const emptyState = document.getElementById('emptyState');
+            const tableBody = document.getElementById('applicationsTableBody');
+
+            try {
+                const response = await fetch(`${API_URL}/applications/recruiter/${currentUser.recruiter_id}`);
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to fetch applications'));
+                }
+
+                const applications = await response.json();
+                applicationsById = {};
+                applications.forEach(app => {
+                    applicationsById[app.application_id] = app;
+                });
+
+                // Fetch ratings for all applications
+                appRatings = {};
+                const ratingPromises = applications.map(async (app) => {
+                    try {
+                        const ratingRes = await fetch(`${API_URL}/applications/${app.application_id}/rating`);
+                        if (ratingRes.ok) {
+                            const data = await ratingRes.json();
+                            if (data.average_rating) {
+                                appRatings[app.application_id] = data.average_rating;
+                            }
+                        }
+                    } catch (e) {}
+                });
+                await Promise.all(ratingPromises);
+
+                loadingState.classList.add('hidden');
+
+                if (applications.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    document.getElementById('applicationCount').textContent = '0 total';
+                    return;
+                }
+
+                document.getElementById('applicationCount').textContent = `${applications.length} total`;
+                emptyState.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                tableBody.innerHTML = '';
+
+                applications.forEach(app => {
+                    const row = createApplicationRow(app);
+                    tableBody.appendChild(row);
+                });
+
+                updateStats(applications);
+
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+                showToast(error.message || 'Could not load applications.', 'error');
+            }
+        }
+
+        function createApplicationRow(app) {
+            const row = document.createElement('tr');
+            row.className = 'table-row transition-colors';
+
+            const statusOptions = ['Applied', 'Screening', 'Interviewing', 'Rejected', 'Hired']
+                .map(status => `<option value="${status}" ${app.status === status ? 'selected' : ''}>${status}</option>`)
+                .join('');
+
+            const appliedDate = new Date(app.created_at).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+
+            const avgRating = appRatings[app.application_id];
+            const starsHtml = renderStars(avgRating || 0, app.application_id);
+
+            row.innerHTML = `
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+                            ${app.candidate_name.charAt(0)}
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">${app.candidate_name}</div>
+                            <div class="text-sm text-slate-500">${app.candidate_email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="font-medium text-slate-800">${app.job_title}</div>
+                    <div class="text-sm text-slate-500">${app.department}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-slate-700">${appliedDate}</div>
+                    <div class="text-xs text-slate-400">${app.location}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col gap-1">
+                        <select onchange="updateStatus(${app.application_id}, this.value)"
+                            class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer">
+                            ${statusOptions}
+                        </select>
+                        <button onclick="showHistoryModal(${app.application_id}, '${app.candidate_name}')" class="text-xs text-blue-600 hover:text-blue-800 text-left">View History</button>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col gap-1">
+                        ${starsHtml}
+                        <span class="text-xs text-slate-400">${avgRating ? avgRating.toFixed(1) : 'Not rated'}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    ${app.status === 'Screening'
+                        ? `<button onclick="showScheduleInterviewModal(${app.application_id})" class="btn-primary text-white text-sm font-medium px-3 py-1.5 rounded-lg">Schedule</button>`
+                        : '<span class="text-xs text-slate-400">—</span>'
+                    }
+                </td>
+            `;
+
+            return row;
+        }
+
+        function renderStars(rating, appId) {
+            let html = '<div class="flex gap-0.5">';
+            for (let i = 1; i <= 5; i++) {
+                const color = i <= rating ? 'text-amber-400' : 'text-slate-300';
+                html += `<button type="button" onclick="rateApplication(${appId}, ${i})" class="${color} hover:text-amber-500 transition-colors text-lg">★</button>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        async function rateApplication(appId, rating) {
+            try {
+                const response = await fetch(`${API_URL}/applications/${appId}/rating`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recruiter_id: currentUser.recruiter_id,
+                        rating: rating,
+                        review_notes: ''
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to save rating');
+
+                appRatings[appId] = rating;
+                showToast(`Rated ${rating} stars!`, 'success');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error rating application:', error);
+                showToast(error.message || 'Could not save rating', 'error');
+            }
+        }
+
+        function showScheduleInterviewModal(applicationId) {
+            selectedApplicationId = applicationId;
+            const app = applicationsById[applicationId];
+            document.getElementById('scheduleInterviewContext').textContent =
+                app ? `Candidate: ${app.candidate_name} | Job: ${app.job_title}` : `Application ID: ${applicationId}`;
+            document.getElementById('interviewDateTime').value = '';
+            document.getElementById('interviewType').value = 'Video';
+            document.getElementById('scheduleInterviewModal').classList.remove('hidden');
+        }
+
+        function hideScheduleInterviewModal() {
+            selectedApplicationId = null;
+            document.getElementById('scheduleInterviewModal').classList.add('hidden');
+        }
+
+        async function handleScheduleInterviewSubmit(event) {
+            event.preventDefault();
+
+            if (!selectedApplicationId) {
+                showInterviewMessage('No application selected for interview scheduling.', 'error');
+                return;
+            }
+
+            const submitButton = document.getElementById('submitInterviewButton');
+            const dateTimeRaw = document.getElementById('interviewDateTime').value;
+            const interviewType = document.getElementById('interviewType').value;
+
+            if (!dateTimeRaw) {
+                showInterviewMessage('Please select interview date and time.', 'error');
+                return;
+            }
+
+            const scheduledAt = `${dateTimeRaw.replace('T', ' ')}:00`;
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Scheduling...';
+
+            try {
+                const response = await fetch(`${API_URL}/interviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        application_id: selectedApplicationId,
+                        scheduled_at: scheduledAt,
+                        interview_type: interviewType
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to schedule interview'));
+                }
+
+                hideScheduleInterviewModal();
+                showInterviewMessage('Interview scheduled successfully!', 'success');
+                showToast('Interview scheduled!', 'success');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error scheduling interview:', error);
+                showInterviewMessage(error.message || 'Could not schedule interview.', 'error');
+                showToast(error.message || 'Could not schedule interview.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Schedule Interview';
+            }
+        }
+
+        async function loadScheduledInterviews() {
+            const loadingState = document.getElementById('interviewsLoadingState');
+            const errorState = document.getElementById('interviewsErrorState');
+            const tableContainer = document.getElementById('interviewsTableContainer');
+            const emptyState = document.getElementById('interviewsEmptyState');
+            const tableBody = document.getElementById('scheduledInterviewsTableBody');
+
+            loadingState.classList.remove('hidden');
+            errorState.classList.add('hidden');
+            tableContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_URL}/interviews/scheduled/recruiter/${currentUser.recruiter_id}`);
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to fetch scheduled interviews'));
+                }
+
+                const interviews = await response.json();
+                loadingState.classList.add('hidden');
+
+                if (!interviews.length) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                tableContainer.classList.remove('hidden');
+                tableBody.innerHTML = '';
+                interviews.forEach(interview => {
+                    tableBody.appendChild(createScheduledInterviewRow(interview));
+                });
+            } catch (error) {
+                console.error('Error loading scheduled interviews:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+                showToast(error.message || 'Could not load scheduled interviews.', 'error');
+            }
+        }
+
+        function createScheduledInterviewRow(interview) {
+            const row = document.createElement('tr');
+            row.className = 'table-row transition-colors';
+
+            const statusOptions = ['Scheduled', 'Completed', 'No-Show', 'Cancelled']
+                .map(status => `<option value="${status}" ${interview.status === status ? 'selected' : ''}>${status}</option>`)
+                .join('');
+
+            row.innerHTML = `
+                <td class="px-6 py-4 text-sm font-medium text-slate-500">#${interview.interview_id}</td>
+                <td class="px-6 py-4">
+                    <div class="font-semibold text-slate-800">${interview.candidate_name}</div>
+                    <div class="text-sm text-slate-500">${interview.candidate_email}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-700">${interview.job_title}</td>
+                <td class="px-6 py-4 text-sm text-slate-700">${formatDateTime(interview.scheduled_at)}</td>
+                <td class="px-6 py-4 text-sm text-slate-700">${interview.interview_type}</td>
+                <td class="px-6 py-4">
+                    <select onchange="updateInterviewStatus(${interview.interview_id}, this.value)"
+                        class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer mb-1">
+                        ${statusOptions}
+                    </select>
+                    ${interview.status === 'Completed' ? `<button onclick="showFeedbackModal(${interview.interview_id}, ${interview.application_id}, '${interview.candidate_name}', '${interview.job_title}')" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Give Feedback</button>` : ''}
+                </td>
+            `;
+
+            return row;
+        }
+
+        async function updateInterviewStatus(interviewId, newStatus) {
+            try {
+                const response = await fetch(`${API_URL}/interviews/${interviewId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to update interview status'));
+                }
+
+                if (newStatus === 'Completed') {
+                    showInterviewMessage('Interview marked as Completed. SQL trigger will update the application status.', 'success');
+                } else {
+                    showInterviewMessage('Interview status updated successfully.', 'success');
+                }
+
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error updating interview status:', error);
+                showInterviewMessage(error.message || 'Could not update interview status.', 'error');
+                showToast(error.message || 'Could not update interview status.', 'error');
+            }
+        }
+
+        function formatDateTime(dateTimeValue) {
+            const date = new Date(dateTimeValue);
+            if (isNaN(date.getTime())) return dateTimeValue;
+            return date.toLocaleString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        async function updateStatus(appId, newStatus) {
+            try {
+                const response = await fetch(`${API_URL}/applications/${appId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        changed_by: currentUser.user_id,
+                        change_reason: `Status manually changed to ${newStatus}`
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(await getApiErrorMessage(response, 'Failed to update application status'));
+                }
+
+                showToast(`Status updated to ${newStatus}!`, 'success');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error updating application status:', error);
+                showToast(error.message || 'Could not update application status.', 'error');
+            }
+        }
+
+        function getScoreColor(score) {
+            if (score >= 85) return 'bg-emerald-500';
+            if (score >= 70) return 'bg-blue-500';
+            if (score >= 60) return 'bg-amber-500';
+            return 'bg-red-500';
+        }
+
+        function getScoreTextColor(score) {
+            if (score >= 85) return 'text-emerald-600';
+            if (score >= 70) return 'text-blue-600';
+            if (score >= 60) return 'text-amber-600';
+            return 'text-red-600';
+        }
+
+        function setRating(rating) {
+            currentRating = rating;
+            document.getElementById('ratingValue').value = rating;
+            const stars = document.querySelectorAll('#starRating button');
+            stars.forEach((star, index) => {
+                star.className = index < rating ? 'text-3xl text-amber-400 hover:text-amber-500 transition-colors' : 'text-3xl text-slate-300 hover:text-amber-400 transition-colors';
+            });
+        }
+
+        function showFeedbackModal(interviewId, applicationId, candidateName, jobTitle) {
+            document.getElementById('feedbackInterviewId').value = interviewId;
+            document.getElementById('feedbackApplicationId').value = applicationId;
+            document.getElementById('feedbackContext').textContent = `${candidateName} - ${jobTitle}`;
+            document.getElementById('feedbackForm').reset();
+            setRating(0);
+            document.getElementById('feedbackMessage').classList.add('hidden');
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+
+        function hideFeedbackModal() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+            currentRating = 0;
+        }
+
+        async function handleFeedbackSubmit(event) {
+            event.preventDefault();
+
+            if (currentRating === 0) {
+                const msg = document.getElementById('feedbackMessage');
+                msg.textContent = 'Please select a rating';
+                msg.className = 'px-4 py-3 rounded-lg border text-sm bg-red-50 border-red-200 text-red-800';
+                return;
+            }
+
+            const submitButton = document.getElementById('submitFeedbackButton');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            try {
+                const response = await fetch(`${API_URL}/interviews/${document.getElementById('feedbackInterviewId').value}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recruiter_id: currentUser.recruiter_id,
+                        rating: currentRating,
+                        recommendation: document.getElementById('recommendation').value,
+                        strengths: document.getElementById('strengths').value,
+                        concerns: document.getElementById('concerns').value,
+                        new_status: document.getElementById('newAppStatus').value,
+                        additional_notes: document.getElementById('additionalNotes').value
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.error || 'Failed to submit feedback');
+                }
+
+                hideFeedbackModal();
+                showToast('Feedback submitted successfully!', 'success');
+                await loadDashboardData();
+            } catch (error) {
+                const msg = document.getElementById('feedbackMessage');
+                msg.textContent = error.message || 'Could not submit feedback';
+                msg.className = 'px-4 py-3 rounded-lg border text-sm bg-red-50 border-red-200 text-red-800';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Feedback';
+            }
+        }
+
+        async function showHistoryModal(applicationId, candidateName) {
+            document.getElementById('historyModal').classList.remove('hidden');
+            document.getElementById('historyLoading').classList.remove('hidden');
+            document.getElementById('historyContent').classList.add('hidden');
+            document.getElementById('historyError').classList.add('hidden');
+            document.getElementById('historyContext').textContent = candidateName;
+
+            try {
+                const response = await fetch(`${API_URL}/applications/${applicationId}/history`);
+                if (!response.ok) throw new Error('Failed to fetch history');
+
+                const data = await response.json();
+                document.getElementById('historyLoading').classList.add('hidden');
+                document.getElementById('historyContent').classList.remove('hidden');
+
+                const timeline = document.getElementById('historyTimeline');
+                timeline.innerHTML = '';
+
+                if (data.history.length === 0) {
+                    timeline.innerHTML = '<p class="text-slate-500 text-center py-4">No status history available</p>';
+                    return;
+                }
+
+                data.history.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex gap-4';
+                    const isLatest = index === data.history.length - 1;
+                    div.innerHTML = `
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full ${isLatest ? 'bg-blue-500' : 'bg-slate-200'} flex items-center justify-center">
+                                <span class="text-white text-xs font-bold">${index + 1}</span>
+                            </div>
+                            ${index < data.history.length - 1 ? '<div class="w-0.5 h-full bg-slate-200"></div>' : ''}
+                        </div>
+                        <div class="flex-1 pb-6">
+                            <div class="flex items-center gap-2">
+                                ${entry.old_status ? `<span class="text-sm text-slate-400 line-through">${entry.old_status}</span>` : ''}
+                                <span class="text-sm text-slate-600">→</span>
+                                <span class="text-sm font-semibold ${isLatest ? 'text-blue-600' : 'text-slate-800'}">${entry.new_status}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">${entry.change_reason || 'No reason provided'}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">By ${entry.changed_by_name} • ${new Date(entry.changed_at).toLocaleString()}</p>
+                        </div>
+                    `;
+                    timeline.appendChild(div);
+                });
+            } catch (error) {
+                document.getElementById('historyLoading').classList.add('hidden');
+                document.getElementById('historyError').classList.remove('hidden');
+            }
+        }
+
+        function hideHistoryModal() {
+            document.getElementById('historyModal').classList.add('hidden');
+        }
+
+        function updateStats(applications) {
+            const total = applications.length;
+            const applied = applications.filter(app => app.status === 'Applied').length;
+            const hired = applications.filter(app => app.status === 'Hired').length;
+            const rejected = applications.filter(app => app.status === 'Rejected').length;
+
+            document.getElementById('totalApps').textContent = total;
+            document.getElementById('appliedCount').textContent = applied;
+            document.getElementById('hiredCount').textContent = hired;
+            document.getElementById('rejectedCount').textContent = rejected;
+        }
+    </script>
+</body>
+</html>

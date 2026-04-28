@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - Smart ATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%); min-height: 100vh; }
+        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+        .table-row:hover { background: linear-gradient(90deg, #f8fafc, #f1f5f9); }
+        .status-applied { background: #dbeafe; color: #1d4ed8; }
+        .status-screening { background: #fef3c7; color: #b45309; }
+        .status-interviewing { background: #ede9fe; color: #7c3aed; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        .status-hired { background: #dcfce7; color: #16a34a; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <header class="hero-gradient text-white">
+        <div class="container mx-auto px-6 py-10">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold">Smart ATS</h1>
+                            <p class="text-blue-200 text-sm">Career Portal</p>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold">My Applications</h2>
+                    <p class="text-blue-200 mt-1">Track your application statuses</p>
+                </div>
+                <div class="text-right">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3 mb-3">
+                        <p id="candidateName" class="font-semibold"></p>
+                        <p id="candidateEmail" class="text-blue-200 text-sm"></p>
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <a href="index.html" class="bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Back to Jobs
+                        </a>
+                        <button id="logoutBtn" class="bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-10">
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <p class="text-sm text-slate-500">Total Applications</p>
+                <p id="totalApps" class="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <p class="text-sm text-slate-500">In Review</p>
+                <p id="inReview" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <p class="text-sm text-slate-500">Interviews</p>
+                <p id="interviews" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <p class="text-sm text-slate-500">Outcomes</p>
+                <p id="outcomes" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-800">Application History</h3>
+            </div>
+
+            <div id="loadingState" class="text-center py-16">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+                <p class="mt-4 text-slate-500">Loading your applications...</p>
+            </div>
+
+            <div id="errorState" class="hidden text-center py-16">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <p class="text-slate-600 font-medium">Error Loading Applications</p>
+            </div>
+
+            <div id="emptyState" class="hidden text-center py-16">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                </div>
+                <p class="text-slate-600 font-medium">No applications yet</p>
+                <p class="text-slate-500 text-sm mt-1">Start applying to jobs to see them here.</p>
+                <a href="index.html" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors">Browse Jobs</a>
+            </div>
+
+            <div id="tableContainer" class="hidden overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Job Title</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Department</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Applied On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTableBody" class="divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureCandidateSession()) return;
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            loadMyApplications();
+        });
+
+        function ensureCandidateSession() {
+            try { currentUser = JSON.parse(localStorage.getItem('user')); } catch (error) { currentUser = null; }
+            if (!currentUser || currentUser.role !== 'candidate') { window.location.href = 'login.html'; return false; }
+            if (!currentUser.candidate_id && currentUser.id) currentUser.candidate_id = currentUser.id;
+            if (!currentUser.candidate_id) { window.location.href = 'login.html'; return false; }
+            document.getElementById('candidateName').textContent = currentUser.full_name || 'Candidate';
+            document.getElementById('candidateEmail').textContent = currentUser.email || '';
+            return true;
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        function getStatusStyle(status) {
+            return `status-${status.toLowerCase()}`;
+        }
+
+        async function loadMyApplications() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
+            const tableBody = document.getElementById('applicationsTableBody');
+
+            try {
+                const response = await fetch(`${API_URL}/applications/candidate/${currentUser.candidate_id}`);
+                if (!response.ok) throw new Error('Failed to fetch applications');
+
+                const applications = await response.json();
+                loadingState.classList.add('hidden');
+
+                // Update stats
+                document.getElementById('totalApps').textContent = applications.length;
+                document.getElementById('inReview').textContent = applications.filter(a => ['Applied', 'Screening'].includes(a.status)).length;
+                document.getElementById('interviews').textContent = applications.filter(a => a.status === 'Interviewing').length;
+                document.getElementById('outcomes').textContent = applications.filter(a => ['Hired', 'Rejected'].includes(a.status)).length;
+
+                if (!applications.length) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                tableContainer.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                tableBody.innerHTML = '';
+
+                applications.forEach(app => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row transition-colors';
+                    const appliedDate = new Date(app.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    const statusClass = getStatusStyle(app.status);
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">${app.job_title.charAt(0)}</div>
+                                <span class="font-semibold text-slate-800">${app.job_title}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${app.department || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${app.location || '-'}</td>
+                        <td class="px-6 py-4"><span class="text-xs font-semibold px-3 py-1 rounded-full ${statusClass}">${app.status}</span></td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${appliedDate}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

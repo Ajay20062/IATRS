@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Schema - ATS System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .table-card {
+            transition: all 0.3s ease;
+        }
+        .table-card:hover {
+            transform: translateY(-5px);
+        }
+        .relationship-line {
+            stroke: #3b82f6;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <h1 class="text-4xl font-bold text-gray-800">📊 Database Schema Viewer</h1>
+            <p class="text-gray-600 mt-2">Intelligent ATS System - Relational Database Structure</p>
+            <div class="mt-4 flex gap-4">
+                <a href="index.html" class="text-blue-600 hover:underline">← Candidate Portal</a>
+                <a href="dashboard.html" class="text-blue-600 hover:underline">Recruiter Dashboard →</a>
+                <a href="api-status.html" class="text-blue-600 hover:underline">API Status →</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Database Info -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Database Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="text-3xl font-bold text-blue-600" id="totalTables">6</div>
+                    <div class="text-gray-600">Total Tables</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="text-3xl font-bold text-green-600" id="totalRecords">-</div>
+                    <div class="text-gray-600">Total Records</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="text-3xl font-bold text-purple-600">MySQL</div>
+                    <div class="text-gray-600">Database Type</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <!-- Recruiters Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-blue-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">👥 Recruiters</h3>
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold" id="recruitersCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">recruiter_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📝</span>
+                        <code>full_name</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📧</span>
+                        <code>email</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">🏢</span>
+                        <code>company</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">⏰</span>
+                        <code>created_at</code>
+                        <span class="text-gray-500 ml-2">TIMESTAMP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobs Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-green-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">💼 Jobs</h3>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold" id="jobsCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">job_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code class="text-blue-600">recruiter_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📋</span>
+                        <code>title</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(150)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">🏛️</span>
+                        <code>department</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📍</span>
+                        <code>status</code>
+                        <span class="text-gray-500 ml-2">ENUM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-purple-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">🎓 Candidates</h3>
+                    <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold" id="candidatesCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">candidate_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📝</span>
+                        <code>full_name</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📧</span>
+                        <code>email</code>
+                        <span class="text-gray-500 ml-2">UNIQUE</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📱</span>
+                        <code>phone</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(30)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📄</span>
+                        <code>resume_url</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(255)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-orange-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">📬 Applications</h3>
+                    <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold" id="applicationsCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">application_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code class="text-blue-600">job_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code class="text-blue-600">candidate_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">🏷️</span>
+                        <code>status</code>
+                        <span class="text-gray-500 ml-2">ENUM</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">⏰</span>
+                        <code>created_at</code>
+                        <span class="text-gray-500 ml-2">TIMESTAMP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interviews Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-red-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">🎤 Interviews</h3>
+                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold" id="interviewsCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">interview_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code class="text-blue-600">application_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📅</span>
+                        <code>scheduled_at</code>
+                        <span class="text-gray-500 ml-2">DATETIME</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📞</span>
+                        <code>interview_type</code>
+                        <span class="text-gray-500 ml-2">ENUM</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">✅</span>
+                        <code>status</code>
+                        <span class="text-gray-500 ml-2">ENUM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-card bg-white rounded-lg shadow-lg p-6 border-t-4 border-indigo-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">🔐 Users</h3>
+                    <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold" id="usersCount">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-2">🔑</span>
+                        <code class="text-purple-600">user_id</code>
+                        <span class="text-gray-500 ml-2">INT PK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📝</span>
+                        <code>full_name</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(100)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">📧</span>
+                        <code>email</code>
+                        <span class="text-gray-500 ml-2">UNIQUE</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">🔒</span>
+                        <code>password_hash</code>
+                        <span class="text-gray-500 ml-2">VARCHAR(255)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2">👤</span>
+                        <code>role</code>
+                        <span class="text-gray-500 ml-2">ENUM</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code>candidate_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2">🔗</span>
+                        <code>recruiter_id</code>
+                        <span class="text-gray-500 ml-2">INT FK</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relationships Diagram -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🔗 Table Relationships</h2>
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <div class="space-y-4">
+                    <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+                        <span class="text-2xl mr-4">👥</span>
+                        <div class="flex-1">
+                            <div class="font-semibold">Recruiters → Jobs</div>
+                            <div class="text-sm text-gray-600">One-to-Many (1:N) | CASCADE DELETE</div>
+                        </div>
+                        <code class="bg-white px-3 py-1 rounded text-sm">recruiter_id</code>
+                    </div>
+
+                    <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                        <span class="text-2xl mr-4">💼</span>
+                        <div class="flex-1">
+                            <div class="font-semibold">Jobs → Applications</div>
+                            <div class="text-sm text-gray-600">One-to-Many (1:N) | CASCADE DELETE</div>
+                        </div>
+                        <code class="bg-white px-3 py-1 rounded text-sm">job_id</code>
+                    </div>
+
+                    <div class="flex items-center p-4 bg-purple-50 rounded-lg">
+                        <span class="text-2xl mr-4">🎓</span>
+                        <div class="flex-1">
+                            <div class="font-semibold">Candidates → Applications</div>
+                            <div class="text-sm text-gray-600">One-to-Many (1:N) | CASCADE DELETE</div>
+                        </div>
+                        <code class="bg-white px-3 py-1 rounded text-sm">candidate_id</code>
+                    </div>
+
+                    <div class="flex items-center p-4 bg-orange-50 rounded-lg">
+                        <span class="text-2xl mr-4">📬</span>
+                        <div class="flex-1">
+                            <div class="font-semibold">Applications → Interviews</div>
+                            <div class="text-sm text-gray-600">One-to-Many (1:N) | CASCADE DELETE</div>
+                        </div>
+                        <code class="bg-white px-3 py-1 rounded text-sm">application_id</code>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-500">
+                    <div class="font-semibold text-yellow-800 mb-2">📝 Key Features:</div>
+                    <ul class="text-sm text-yellow-700 space-y-1 ml-4">
+                        <li>✓ All tables use AUTO_INCREMENT primary keys</li>
+                        <li>✓ Foreign keys enforce referential integrity</li>
+                        <li>✓ CASCADE DELETE maintains data consistency</li>
+                        <li>✓ ENUM types restrict invalid values</li>
+                        <li>✓ UNIQUE constraint on candidate email</li>
+                        <li>✓ TIMESTAMP columns track record creation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Data Preview -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mt-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Live Data Preview</h2>
+            <div id="dataPreview" class="space-y-4">
+                <div class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    <p class="mt-4 text-gray-600">Loading data...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+
+        async function loadDatabaseStats() {
+            try {
+                // Fetch counts from different endpoints
+                const [dbInfo, jobs, applications] = await Promise.all([
+                    fetch(`${API_URL}/meta/db-info`).then(r => r.json()),
+                    fetch(`${API_URL}/jobs`).then(r => r.json()),
+                    fetch(`${API_URL}/applications`).then(r => r.json())
+                ]);
+
+                // Update counts from actual database info
+                document.getElementById('jobsCount').textContent = dbInfo.counts.jobs;
+                document.getElementById('applicationsCount').textContent = dbInfo.counts.applications;
+                document.getElementById('candidatesCount').textContent = dbInfo.counts.candidates;
+                document.getElementById('recruitersCount').textContent = dbInfo.counts.recruiters;
+                document.getElementById('usersCount').textContent = dbInfo.counts.users || (dbInfo.counts.candidates + dbInfo.counts.recruiters);
+
+                // Total records
+                const total = dbInfo.counts.jobs + dbInfo.counts.applications + dbInfo.counts.candidates + dbInfo.counts.recruiters;
+                document.getElementById('totalRecords').textContent = total;
+
+                // Interviews count needs separate query - set to 0 as placeholder
+                document.getElementById('interviewsCount').textContent = '-';
+
+                // Show data preview
+                showDataPreview(jobs, applications);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('dataPreview').innerHTML = `
+                    <div class="text-center py-8 text-red-600">
+                        <p>⚠️ Could not connect to API</p>
+                        <p class="text-sm mt-2">Make sure Flask server is running on port 5001</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showDataPreview(jobs, applications) {
+            const preview = document.getElementById('dataPreview');
+            preview.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-lg mb-3">Recent Jobs</h3>
+                        <div class="space-y-2">
+                            ${jobs.slice(0, 3).map(job => `
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-blue-500">
+                                    <div class="font-semibold">${job.title}</div>
+                                    <div class="text-sm text-gray-600">${job.department} • ${job.location}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-3">Recent Applications</h3>
+                        <div class="space-y-2">
+                            ${applications.slice(0, 3).map(app => `
+                                <div class="p-3 bg-gray-50 rounded border-l-4 border-green-500">
+                                    <div class="font-semibold">${app.candidate_name}</div>
+                                    <div class="text-sm text-gray-600">${app.job_title} • ${app.status}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDatabaseStats);
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ATS - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+        .btn-gradient:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4 py-6">
+    <div class="w-full max-w-md">
+        <div class="glass-card rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-8 text-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mx-auto mb-3 flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-white">Welcome Back</h1>
+                <p class="text-slate-400 text-sm mt-1">Sign in to continue to Smart ATS</p>
+            </div>
+
+            <!-- Message Box -->
+            <div id="messageBox" class="hidden mx-6 mt-5 px-4 py-3 rounded-xl border text-sm font-medium"></div>
+
+            <!-- Form -->
+            <form id="loginForm" class="px-6 py-5 space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+                    <input id="email" type="email" required placeholder="you@company.com"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+                    <input id="password" type="password" required placeholder="••••••••"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none" />
+                </div>
+
+                <div>
+                    <label for="role" class="block text-sm font-medium text-slate-700 mb-1.5">Sign in as</label>
+                    <select id="role" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm input-field transition-all outline-none bg-white">
+                        <option value="candidate">Candidate - Browse & apply for jobs</option>
+                        <option value="recruiter">Recruiter - Manage jobs & candidates</option>
+                    </select>
+                </div>
+
+                <button id="loginButton" type="submit" class="w-full btn-gradient text-white font-semibold py-3 rounded-xl transition-all mt-2">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="px-6 pb-6">
+                <div class="flex items-center justify-center gap-2 text-sm text-slate-500">
+                    <span>New to Smart ATS?</span>
+                    <a href="auth.html" class="text-blue-600 font-semibold hover:text-blue-700 hover:underline">Create account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const loginButton = document.getElementById('loginButton');
+            const payload = {
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            showMessage('', 'error', true);
+            loginButton.disabled = true;
+            loginButton.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || 'Login failed');
+                }
+
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                if (data.user.role === 'candidate') {
+                    window.location.href = 'index.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                showMessage(error.message || 'Unable to login right now.');
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'Sign In';
+            }
+        });
+
+        function showMessage(message, type = 'error', hide = false) {
+            const messageBox = document.getElementById('messageBox');
+
+            if (hide) {
+                messageBox.className = 'hidden mx-6 mt-5 px-4 py-3 rounded-xl border text-sm font-medium';
+                messageBox.textContent = '';
+                return;
+            }
+
+            if (type === 'success') {
+                messageBox.className = `mx-6 mt-5 px-4 py-3 rounded-xl border text-sm font-medium bg-emerald-50 border-emerald-200 text-emerald-800`;
+            } else {
+                messageBox.className = `mx-6 mt-5 px-4 py-3 rounded-xl border text-sm font-medium bg-red-50 border-red-200 text-red-800`;
+            }
+            messageBox.textContent = message;
+        }
+    </script>
+</body>
+</html>
