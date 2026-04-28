@@ -10,6 +10,11 @@ from db_connect import get_db_connection
 # Initialize Flask app
 app = Flask(__name__)
 
+# Flask configuration
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
 # Enable CORS for all routes
 CORS(app)
 
