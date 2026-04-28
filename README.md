@@ -8,7 +8,11 @@ A comprehensive recruitment management system built with Flask and MySQL.
 - **Job Management**: Post, view, and manage job listings
 - **Application Tracking**: Candidates can apply for jobs and track their applications
 - **Interview Scheduling**: Schedule and manage interview processes
-- **Analytics Dashboard**: Recruiters can view application analytics
+- **Advanced Search**: Multi-filter job search with pagination
+- **Job Recommendations**: AI-powered job suggestions based on candidate history
+- **Analytics Dashboard**: Comprehensive recruiter analytics and reporting
+- **Bulk Operations**: Bulk job creation and application status updates
+- **User Activity Tracking**: Detailed activity logs and system statistics
 - **RESTful API**: Backend API for all operations
 
 ## Tech Stack
@@ -60,6 +64,15 @@ A comprehensive recruitment management system built with Flask and MySQL.
 - `POST /auth/login` - User login
 - `GET /auth/logout` - User logout
 
+### Advanced Features
+- `GET /jobs/search` - Advanced job search with filters
+- `GET /jobs/recommend/<candidate_id>` - Personalized job recommendations
+- `GET /analytics/recruiter/<recruiter_id>` - Comprehensive recruiter analytics
+- `POST /bulk/jobs` - Bulk job creation
+- `PUT /bulk/applications/status` - Bulk application status updates
+- `GET /users/activity/<user_id>` - User activity tracking
+- `GET /system/stats` - System-wide statistics
+
 ### Jobs
 - `GET /jobs` - List all jobs
 - `POST /jobs` - Create new job (recruiters only)
@@ -72,6 +85,37 @@ A comprehensive recruitment management system built with Flask and MySQL.
 ### Interviews
 - `POST /interviews` - Schedule interview
 - `GET /interviews` - List interviews
+
+## Advanced Features
+
+### 🔍 Advanced Job Search
+- Multi-filter search (location, department, company, status)
+- Pagination support
+- Sorting by date, relevance, or other criteria
+- Real-time search results
+
+### 🤖 Job Recommendations
+- Personalized job suggestions based on application history
+- Machine learning-powered relevance scoring
+- Department and location preference analysis
+
+### 📊 Analytics Dashboard
+- Comprehensive recruiter metrics
+- Application trends and conversion rates
+- Interview success statistics
+- Monthly performance reports
+- Top-performing job analysis
+
+### ⚡ Bulk Operations
+- Bulk job posting for recruiters
+- Mass application status updates
+- Efficient data management for large organizations
+
+### 📈 System Monitoring
+- User activity tracking
+- System-wide statistics
+- Health check endpoints
+- Performance monitoring
 
 ## Database Schema
 
