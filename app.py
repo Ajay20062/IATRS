@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from mysql.connector import IntegrityError
 import re
 import os
+import logging
 from datetime import datetime
 from db_connect import get_db_connection
 
@@ -17,6 +18,17 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Enable CORS for all routes
 CORS(app)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 ALLOWED_ROLES = {'candidate', 'recruiter'}
 ALLOWED_APPLICATION_STATUSES = {'Applied', 'Screening', 'Interviewing', 'Rejected', 'Hired'}
@@ -178,18 +190,21 @@ def health_check():
         connection = get_db_connection()
         if connection:
             connection.close()
+            logger.info("Health check passed - database connected")
             return jsonify({
                 'status': 'healthy',
                 'database': 'connected',
                 'timestamp': datetime.now().isoformat()
             }), 200
         else:
+            logger.warning("Health check failed - database disconnected")
             return jsonify({
                 'status': 'unhealthy',
                 'database': 'disconnected',
                 'timestamp': datetime.now().isoformat()
             }), 503
     except Exception as e:
+        logger.error(f"Health check error: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': str(e),
