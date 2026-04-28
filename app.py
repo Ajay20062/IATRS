@@ -19,6 +19,10 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # Enable CORS for all routes
 CORS(app)
 
+# Configure static file serving
+app.static_folder = 'frontend'
+app.static_url_path = '/static'
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -633,15 +637,58 @@ def login_with_role():
 @app.route('/')
 def index():
     """
-    Test route to verify the API is running.
+    Serve the main application page.
     
     Returns:
-        JSON response with success message
+        HTML page for the recruitment system
     """
-    return jsonify({
-        'message': 'ATS API is running successfully!',
-        'database': os.getenv('DB_NAME')
-    })
+    return app.send_static_file('index.html')
+
+# Frontend routes
+@app.route('/login')
+def login_page():
+    """Serve login page"""
+    return app.send_static_file('login.html')
+
+@app.route('/register')
+def register_page():
+    """Serve registration page"""
+    return app.send_static_file('register.html')
+
+@app.route('/dashboard')
+def dashboard_page():
+    """Serve dashboard page"""
+    return app.send_static_file('dashboard.html')
+
+@app.route('/recruiter/jobs')
+def recruiter_jobs_page():
+    """Serve recruiter jobs page"""
+    return app.send_static_file('recruiter_jobs.html')
+
+@app.route('/recruiter/candidates')
+def recruiter_candidates_page():
+    """Serve recruiter candidates page"""
+    return app.send_static_file('recruiter_candidates.html')
+
+@app.route('/recruiter/analytics')
+def recruiter_analytics_page():
+    """Serve recruiter analytics page"""
+    return app.send_static_file('recruiter_analytics.html')
+
+@app.route('/my-applications')
+def my_applications_page():
+    """Serve candidate applications page"""
+    return app.send_static_file('my_applications.html')
+
+@app.route('/api-status')
+def api_status_page():
+    """Serve API status page"""
+    return app.send_static_file('api-status.html')
+
+@app.route('/database-schema')
+def database_schema_page():
+    """Serve database schema page"""
+    return app.send_static_file('database-schema.html')
 
 @app.route('/meta/db-info', methods=['GET'])
 def get_database_info():
