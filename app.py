@@ -169,6 +169,33 @@ def initialize_interview_artifacts():
 initialize_auth_table()
 initialize_interview_artifacts()
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """
+    Health check endpoint to verify service and database connectivity.
+    """
+    try:
+        connection = get_db_connection()
+        if connection:
+            connection.close()
+            return jsonify({
+                'status': 'healthy',
+                'database': 'connected',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+        else:
+            return jsonify({
+                'status': 'unhealthy',
+                'database': 'disconnected',
+                'timestamp': datetime.now().isoformat()
+            }), 503
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @app.route('/auth/register', methods=['POST'])
 def register_user():
     """
