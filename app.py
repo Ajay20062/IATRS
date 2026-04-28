@@ -865,6 +865,744 @@ def create_job():
         if connection and connection.is_connected():
             connection.close()
 
+# ===== ADVANCED FEATURES =====
+
+@app.route('/jobs/search', methods=['GET'])
+def advanced_job_search():
+    """
+    Advanced job search with multiple filters.
+
+    Query parameters:
+        - q: General search query (title, department, location)
+        - location: Specific location filter
+        - department: Department filter
+        - recruiter_id: Filter by recruiter
+        - status: Job status (Open, Closed, Paused)
+        - min_experience: Minimum experience level (optional)
+        - max_experience: Maximum experience level (optional)
+        - sort_by: Sort field (created_at, title, location)
+        - sort_order: Sort order (asc, desc)
+        - page: Page number (default: 1)
+        - per_page: Results per page (default: 10)
+    """
+    connection = None
+    cursor = None
+
+    try:
+        # Get query parameters
+        search_query = request.args.get('q', '').strip()
+        location = request.args.get('location', '').strip()
+        department = request.args.get('department', '').strip()
+        recruiter_id = request.args.get('recruiter_id', '').strip()
+        status = request.args.get('status', 'Open')  # Default to open jobs
+        min_exp = request.args.get('min_experience', '').strip()
+        max_exp = request.args.get('max_experience', '').strip()
+        sort_by = request.args.get('sort_by', 'created_at')
+        sort_order = request.args.get('sort_order', 'desc')
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+
+        # Validate sort parameters
+        allowed_sort_fields = ['created_at', 'title', 'location', 'department']
+        if sort_by not in allowed_sort_fields:
+            sort_by = 'created_at'
+        if sort_order not in ['asc', 'desc']:
+            sort_order = 'desc'
+
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor(dictionary=True)
+
+        # Build dynamic query
+        base_query = """
+            SELECT j.job_id, j.title, j.department, j.location, j.status, j.created_at,
+                   r.full_name as recruiter_name, r.company,
+                   COUNT(a.application_id) as application_count
+            FROM Jobs j
+            JOIN Recruiters r ON j.recruiter_id = r.recruiter_id
+            LEFT JOIN Applications a ON j.job_id = a.job_id
+        """
+
+        where_conditions = []
+        params = []
+
+        # Add filters
+        if search_query:
+            where_conditions.append("(j.title LIKE %s OR j.department LIKE %s OR j.location LIKE %s)")
+            search_param = f"%{search_query}%"
+            params.extend([search_param, search_param, search_param])
+
+        if location:
+            where_conditions.append("j.location LIKE %s")
+            params.append(f"%{location}%")
+
+        if department:
+            where_conditions.append("j.department LIKE %s")
+            params.append(f"%{department}%")
+
+        if recruiter_id:
+            where_conditions.append("j.recruiter_id = %s")
+            params.append(recruiter_id)
+
+        if status:
+            where_conditions.append("j.status = %s")
+            params.append(status)
+
+        # Build WHERE clause
+        where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
+
+        # Complete query with GROUP BY, ORDER BY, LIMIT
+        query = f"""
+            {base_query}
+            WHERE {where_clause}
+            GROUP BY j.job_id, j.title, j.department, j.location, j.status, j.created_at, r.full_name, r.company
+            ORDER BY j.{sort_by} {sort_order}
+            LIMIT %s OFFSET %s
+        """
+
+        # Calculate offset
+        offset = (page - 1) * per_page
+        params.extend([per_page, offset])
+
+        cursor.execute(query, params)
+        jobs = cursor.fetchall()
+
+        # Get total count for pagination
+        count_query = f"""
+            SELECT COUNT(DISTINCT j.job_id) as total
+            FROM Jobs j
+            JOIN Recruiters r ON j.recruiter_id = r.recruiter_id
+            LEFT JOIN Applications a ON j.job_id = a.job_id
+            WHERE {where_clause}
+        """
+        cursor.execute(count_query, params[:-2])  # Remove LIMIT and OFFSET params
+        total_result = cursor.fetchone()
+        total_jobs = total_result['total'] if total_result else 0
+
+        return jsonify({
+            'jobs': jobs,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_jobs,
+                'total_pages': (total_jobs + per_page - 1) // per_page
+            },
+            'filters_applied': {
+                'query': search_query,
+                'location': location,
+                'department': department,
+                'recruiter_id': recruiter_id,
+                'status': status
+            }
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Advanced job search error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/jobs/recommend/<int:candidate_id>', methods=['GET'])
+def get_job_recommendations(candidate_id):
+    """
+    Get personalized job recommendations for a candidate.
+
+    Uses candidate's application history and profile to suggest relevant jobs.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor(dictionary=True)
+
+        # Get candidate's application history to understand preferences
+        cursor.execute("""
+            SELECT j.department, j.location, COUNT(*) as application_count
+            FROM Applications a
+            JOIN Jobs j ON a.job_id = j.job_id
+            WHERE a.candidate_id = %s
+            GROUP BY j.department, j.location
+            ORDER BY application_count DESC
+            LIMIT 5
+        """, (candidate_id,))
+
+        preferences = cursor.fetchall()
+
+        # Build recommendation query based on preferences
+        if preferences:
+            # Create dynamic conditions based on candidate's history
+            dept_conditions = [f"j.department = '{pref['department']}'" for pref in preferences]
+            loc_conditions = [f"j.location LIKE '%{pref['location']}%'" for pref in preferences]
+
+            dept_clause = " OR ".join(dept_conditions)
+            loc_clause = " OR ".join(loc_conditions)
+
+            query = f"""
+                SELECT j.job_id, j.title, j.department, j.location, j.created_at,
+                       r.full_name as recruiter_name, r.company,
+                       COUNT(a.application_id) as application_count,
+                       CASE
+                           WHEN j.department IN ({', '.join([f"'{pref['department']}'" for pref in preferences])}) THEN 3
+                           WHEN j.location LIKE CONCAT('%', c.location_pref, '%') THEN 2
+                           ELSE 1
+                       END as relevance_score
+                FROM Jobs j
+                JOIN Recruiters r ON j.recruiter_id = r.recruiter_id
+                LEFT JOIN Applications a ON j.job_id = a.job_id
+                CROSS JOIN (SELECT '{preferences[0]['location']}' as location_pref) c
+                WHERE j.status = 'Open'
+                AND j.job_id NOT IN (
+                    SELECT job_id FROM Applications WHERE candidate_id = %s
+                )
+                GROUP BY j.job_id, j.title, j.department, j.location, j.created_at, r.full_name, r.company
+                ORDER BY relevance_score DESC, j.created_at DESC
+                LIMIT 10
+            """
+        else:
+            # Default recommendations for new candidates
+            query = """
+                SELECT j.job_id, j.title, j.department, j.location, j.created_at,
+                       r.full_name as recruiter_name, r.company,
+                       COUNT(a.application_id) as application_count,
+                       1 as relevance_score
+                FROM Jobs j
+                JOIN Recruiters r ON j.recruiter_id = r.recruiter_id
+                LEFT JOIN Applications a ON j.job_id = a.job_id
+                WHERE j.status = 'Open'
+                AND j.job_id NOT IN (
+                    SELECT job_id FROM Applications WHERE candidate_id = %s
+                )
+                GROUP BY j.job_id, j.title, j.department, j.location, j.created_at, r.full_name, r.company
+                ORDER BY j.created_at DESC
+                LIMIT 10
+            """
+
+        cursor.execute(query, (candidate_id,))
+        recommendations = cursor.fetchall()
+
+        return jsonify({
+            'recommendations': recommendations,
+            'candidate_id': candidate_id,
+            'total_recommendations': len(recommendations)
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Job recommendations error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/analytics/recruiter/<int:recruiter_id>', methods=['GET'])
+def get_recruiter_analytics(recruiter_id):
+    """
+    Advanced analytics for recruiters.
+
+    Returns comprehensive statistics about jobs, applications, and performance.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor(dictionary=True)
+
+        # Job statistics
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_jobs,
+                SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_jobs,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed_jobs,
+                AVG(application_count) as avg_applications_per_job
+            FROM (
+                SELECT j.job_id, j.status, COUNT(a.application_id) as application_count
+                FROM Jobs j
+                LEFT JOIN Applications a ON j.job_id = a.job_id
+                WHERE j.recruiter_id = %s
+                GROUP BY j.job_id, j.status
+            ) job_stats
+        """, (recruiter_id,))
+
+        job_stats = cursor.fetchone()
+
+        # Application statistics by status
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_applications,
+                SUM(CASE WHEN status = 'Applied' THEN 1 ELSE 0 END) as applied,
+                SUM(CASE WHEN status = 'Screening' THEN 1 ELSE 0 END) as screening,
+                SUM(CASE WHEN status = 'Interviewing' THEN 1 ELSE 0 END) as interviewing,
+                SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
+                SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as hired
+            FROM Applications a
+            JOIN Jobs j ON a.job_id = j.job_id
+            WHERE j.recruiter_id = %s
+        """, (recruiter_id,))
+
+        app_stats = cursor.fetchone()
+
+        # Interview statistics
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_interviews,
+                SUM(CASE WHEN status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'No-Show' THEN 1 ELSE 0 END) as no_show,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled
+            FROM Interviews i
+            JOIN Applications a ON i.application_id = a.application_id
+            JOIN Jobs j ON a.job_id = j.job_id
+            WHERE j.recruiter_id = %s
+        """, (recruiter_id,))
+
+        interview_stats = cursor.fetchone()
+
+        # Monthly trends (last 6 months)
+        cursor.execute("""
+            SELECT
+                DATE_FORMAT(j.created_at, '%Y-%m') as month,
+                COUNT(DISTINCT j.job_id) as jobs_posted,
+                COUNT(a.application_id) as applications_received
+            FROM Jobs j
+            LEFT JOIN Applications a ON j.job_id = a.job_id
+            WHERE j.recruiter_id = %s
+            AND j.created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+            GROUP BY DATE_FORMAT(j.created_at, '%Y-%m')
+            ORDER BY month DESC
+        """, (recruiter_id,))
+
+        monthly_trends = cursor.fetchall()
+
+        # Top performing jobs
+        cursor.execute("""
+            SELECT
+                j.job_id, j.title, j.department, j.location,
+                COUNT(a.application_id) as application_count,
+                COUNT(CASE WHEN a.status = 'Hired' THEN 1 END) as hires
+            FROM Jobs j
+            LEFT JOIN Applications a ON j.job_id = a.job_id
+            WHERE j.recruiter_id = %s
+            GROUP BY j.job_id, j.title, j.department, j.location
+            ORDER BY application_count DESC
+            LIMIT 5
+        """, (recruiter_id,))
+
+        top_jobs = cursor.fetchall()
+
+        return jsonify({
+            'recruiter_id': recruiter_id,
+            'job_statistics': job_stats,
+            'application_statistics': app_stats,
+            'interview_statistics': interview_stats,
+            'monthly_trends': monthly_trends,
+            'top_performing_jobs': top_jobs,
+            'generated_at': datetime.now().isoformat()
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Recruiter analytics error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/bulk/jobs', methods=['POST'])
+def bulk_create_jobs():
+    """
+    Bulk create multiple job postings.
+
+    Expected JSON data:
+        - jobs: Array of job objects
+        - recruiter_id: ID of the recruiter (can be overridden per job)
+
+    Each job object should contain:
+        - title, department, location, recruiter_id (optional)
+    """
+    connection = None
+    cursor = None
+
+    try:
+        data = request.get_json() or {}
+
+        if 'jobs' not in data or not isinstance(data['jobs'], list):
+            return jsonify({'error': 'Missing or invalid jobs array'}), 400
+
+        jobs = data['jobs']
+        if not jobs:
+            return jsonify({'error': 'Jobs array cannot be empty'}), 400
+
+        if len(jobs) > 50:  # Limit bulk operations
+            return jsonify({'error': 'Maximum 50 jobs allowed in bulk operation'}), 400
+
+        default_recruiter_id = data.get('recruiter_id')
+
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor()
+
+        successful_jobs = []
+        failed_jobs = []
+
+        for i, job_data in enumerate(jobs):
+            try:
+                # Validate required fields
+                title = job_data.get('title', '').strip()
+                department = job_data.get('department', '').strip()
+                location = job_data.get('location', '').strip()
+                recruiter_id = job_data.get('recruiter_id', default_recruiter_id)
+
+                if not all([title, department, location, recruiter_id]):
+                    failed_jobs.append({
+                        'index': i,
+                        'error': 'Missing required fields: title, department, location, recruiter_id'
+                    })
+                    continue
+
+                # Insert job
+                sql = """
+                    INSERT INTO Jobs (recruiter_id, title, department, location)
+                    VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(sql, (recruiter_id, title, department, location))
+
+                successful_jobs.append({
+                    'index': i,
+                    'job_id': cursor.lastrowid,
+                    'title': title
+                })
+
+            except Exception as e:
+                failed_jobs.append({
+                    'index': i,
+                    'error': str(e)
+                })
+
+        connection.commit()
+
+        return jsonify({
+            'message': f'Bulk job creation completed',
+            'successful': len(successful_jobs),
+            'failed': len(failed_jobs),
+            'successful_jobs': successful_jobs,
+            'failed_jobs': failed_jobs
+        }), 201
+
+    except Exception as e:
+        if connection:
+            connection.rollback()
+        logger.error(f"Bulk job creation error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/bulk/applications/status', methods=['PUT'])
+def bulk_update_application_status():
+    """
+    Bulk update application statuses.
+
+    Expected JSON data:
+        - application_ids: Array of application IDs
+        - status: New status for all applications
+        - recruiter_id: Recruiter ID (for authorization)
+    """
+    connection = None
+    cursor = None
+
+    try:
+        data = request.get_json() or {}
+
+        application_ids = data.get('application_ids', [])
+        new_status = data.get('status', '').strip()
+        recruiter_id = data.get('recruiter_id')
+
+        if not application_ids or not isinstance(application_ids, list):
+            return jsonify({'error': 'Missing or invalid application_ids array'}), 400
+
+        if new_status not in ALLOWED_APPLICATION_STATUSES:
+            return jsonify({'error': f'Invalid status. Allowed: {", ".join(ALLOWED_APPLICATION_STATUSES)}'}), 400
+
+        if not recruiter_id:
+            return jsonify({'error': 'Missing recruiter_id'}), 400
+
+        if len(application_ids) > 100:  # Limit bulk operations
+            return jsonify({'error': 'Maximum 100 applications allowed in bulk operation'}), 400
+
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor()
+
+        # Verify recruiter owns these applications
+        placeholders = ','.join(['%s'] * len(application_ids))
+        cursor.execute(f"""
+            SELECT COUNT(*) as count
+            FROM Applications a
+            JOIN Jobs j ON a.job_id = j.job_id
+            WHERE a.application_id IN ({placeholders})
+            AND j.recruiter_id = %s
+        """, application_ids + [recruiter_id])
+
+        result = cursor.fetchone()
+        if result[0] != len(application_ids):
+            return jsonify({'error': 'Unauthorized: Some applications do not belong to this recruiter'}), 403
+
+        # Update statuses
+        update_sql = f"""
+            UPDATE Applications
+            SET status = %s, updated_at = CURRENT_TIMESTAMP
+            WHERE application_id IN ({placeholders})
+        """
+        cursor.execute(update_sql, [new_status] + application_ids)
+
+        connection.commit()
+
+        return jsonify({
+            'message': f'Successfully updated {cursor.rowcount} applications to status: {new_status}',
+            'updated_count': cursor.rowcount,
+            'new_status': new_status
+        }), 200
+
+    except Exception as e:
+        if connection:
+            connection.rollback()
+        logger.error(f"Bulk application status update error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/users/activity/<int:user_id>', methods=['GET'])
+def get_user_activity(user_id):
+    """
+    Get detailed activity log for a user.
+
+    Returns recent actions, login history, and engagement metrics.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        # Get query parameters
+        limit = int(request.args.get('limit', 20))
+        offset = int(request.args.get('offset', 0))
+
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor(dictionary=True)
+
+        # Get user basic info
+        cursor.execute("""
+            SELECT u.user_id, u.full_name, u.email, u.role, u.created_at,
+                   CASE
+                       WHEN u.role = 'candidate' THEN c.candidate_id
+                       WHEN u.role = 'recruiter' THEN r.recruiter_id
+                   END as profile_id
+            FROM Users u
+            LEFT JOIN Candidates c ON u.candidate_id = c.candidate_id
+            LEFT JOIN Recruiters r ON u.recruiter_id = r.recruiter_id
+            WHERE u.user_id = %s
+        """, (user_id,))
+
+        user_info = cursor.fetchone()
+        if not user_info:
+            return jsonify({'error': 'User not found'}), 404
+
+        activities = []
+
+        if user_info['role'] == 'candidate':
+            # Candidate activities
+            cursor.execute("""
+                SELECT 'application' as activity_type,
+                       CONCAT('Applied for job: ', j.title) as description,
+                       a.created_at as activity_date,
+                       a.status as status
+                FROM Applications a
+                JOIN Jobs j ON a.job_id = j.job_id
+                WHERE a.candidate_id = %s
+                ORDER BY a.created_at DESC
+                LIMIT %s OFFSET %s
+            """, (user_info['profile_id'], limit, offset))
+
+            activities.extend(cursor.fetchall())
+
+        elif user_info['role'] == 'recruiter':
+            # Recruiter activities
+            cursor.execute("""
+                SELECT 'job_posted' as activity_type,
+                       CONCAT('Posted job: ', j.title) as description,
+                       j.created_at as activity_date,
+                       j.status as status
+                FROM Jobs j
+                WHERE j.recruiter_id = %s
+                ORDER BY j.created_at DESC
+                LIMIT %s OFFSET %s
+            """, (user_info['profile_id'], limit, offset))
+
+            activities.extend(cursor.fetchall())
+
+        # Get activity summary
+        cursor.execute("""
+            SELECT
+                COUNT(CASE WHEN activity_type = 'application' THEN 1 END) as total_applications,
+                COUNT(CASE WHEN activity_type = 'job_posted' THEN 1 END) as total_jobs_posted,
+                MAX(activity_date) as last_activity
+            FROM (
+                SELECT 'application' as activity_type, a.created_at as activity_date
+                FROM Applications a WHERE a.candidate_id = %s
+                UNION ALL
+                SELECT 'job_posted' as activity_type, j.created_at as activity_date
+                FROM Jobs j WHERE j.recruiter_id = %s
+            ) combined_activities
+        """, (user_info.get('profile_id'), user_info.get('profile_id')))
+
+        summary = cursor.fetchone()
+
+        return jsonify({
+            'user': user_info,
+            'activities': activities,
+            'summary': summary,
+            'pagination': {
+                'limit': limit,
+                'offset': offset,
+                'has_more': len(activities) == limit
+            }
+        }), 200
+
+    except Exception as e:
+        logger.error(f"User activity error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+@app.route('/system/stats', methods=['GET'])
+def get_system_statistics():
+    """
+    Get overall system statistics.
+
+    Returns aggregated data about users, jobs, applications, etc.
+    Requires admin privileges (not implemented in this demo).
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = connection.cursor(dictionary=True)
+
+        # User statistics
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_users,
+                SUM(CASE WHEN role = 'candidate' THEN 1 ELSE 0 END) as total_candidates,
+                SUM(CASE WHEN role = 'recruiter' THEN 1 ELSE 0 END) as total_recruiters
+            FROM Users
+        """)
+
+        user_stats = cursor.fetchone()
+
+        # Job statistics
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_jobs,
+                SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_jobs,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed_jobs,
+                AVG(app_count) as avg_applications_per_job
+            FROM (
+                SELECT j.status, COUNT(a.application_id) as app_count
+                FROM Jobs j
+                LEFT JOIN Applications a ON j.job_id = a.job_id
+                GROUP BY j.job_id, j.status
+            ) job_apps
+        """)
+
+        job_stats = cursor.fetchone()
+
+        # Application statistics
+        cursor.execute("""
+            SELECT
+                COUNT(*) as total_applications,
+                SUM(CASE WHEN status = 'Applied' THEN 1 ELSE 0 END) as applied,
+                SUM(CASE WHEN status = 'Screening' THEN 1 ELSE 0 END) as screening,
+                SUM(CASE WHEN status = 'Interviewing' THEN 1 ELSE 0 END) as interviewing,
+                SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
+                SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as hired
+            FROM Applications
+        """)
+
+        app_stats = cursor.fetchone()
+
+        # Recent activity (last 30 days)
+        cursor.execute("""
+            SELECT
+                COUNT(DISTINCT j.job_id) as jobs_last_30_days,
+                COUNT(DISTINCT a.application_id) as applications_last_30_days,
+                COUNT(DISTINCT u.user_id) as users_last_30_days
+            FROM Jobs j
+            CROSS JOIN Applications a
+            CROSS JOIN Users u
+            WHERE j.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+               OR a.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+               OR u.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        """)
+
+        recent_activity = cursor.fetchone()
+
+        return jsonify({
+            'user_statistics': user_stats,
+            'job_statistics': job_stats,
+            'application_statistics': app_stats,
+            'recent_activity': recent_activity,
+            'generated_at': datetime.now().isoformat()
+        }), 200
+
+    except Exception as e:
+        logger.error(f"System statistics error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
 @app.route('/apply', methods=['POST'])
 def apply_for_job():
     """
