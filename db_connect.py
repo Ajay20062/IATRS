@@ -23,7 +23,6 @@ def get_db_connection():
         )
         
         if connection.is_connected():
-            print("Successfully connected to MySQL Server")
             return connection
             
     except Error as e:

@@ -1,0 +1,149 @@
+2026-04-28 21:52:06,270 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 21:52:06,272 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 21:52:06,275 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 21:52:06,995 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 21:52:07,009 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 21:52:11,568 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 21:52:13,092 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 21:52:13,093 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 21:52:13,097 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 21:52:14,104 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 21:52:14,113 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 21:52:29,642 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 21:52:30,396 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 21:52:30,397 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 21:52:30,397 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 21:52:31,092 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 21:52:31,097 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 21:56:42,657 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 21:56:44,434 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 21:56:44,434 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 21:56:44,435 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 21:56:45,979 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 21:56:45,989 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:33:40,363 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:33:40,365 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:33:40,367 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:33:42,522 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-04-28 22:33:42,524 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-04-28 22:33:42,537 - werkzeug - INFO -  * Restarting with stat
+2026-04-28 22:33:44,364 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:33:44,365 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:33:44,365 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:33:46,089 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:33:46,110 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:33:52,835 - __main__ - WARNING - Health check failed - database disconnected
+2026-04-28 22:33:52,852 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:33:52] "[35m[1mGET /health HTTP/1.1[0m" 503 -
+2026-04-28 22:35:20,859 - __main__ - WARNING - Health check failed - database disconnected
+2026-04-28 22:35:20,861 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:35:20] "[35m[1mGET /health HTTP/1.1[0m" 503 -
+2026-04-28 22:35:37,512 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:35:37,513 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:35:37,514 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:35:39,066 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-04-28 22:35:39,067 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-04-28 22:35:39,071 - werkzeug - INFO -  * Restarting with stat
+2026-04-28 22:35:40,036 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:35:40,038 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:35:40,039 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:35:41,070 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:35:41,081 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:35:46,361 - __main__ - WARNING - Health check failed - database disconnected
+2026-04-28 22:35:46,373 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:35:46] "[35m[1mGET /health HTTP/1.1[0m" 503 -
+2026-04-28 22:36:28,612 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:36:28] "[35m[1mGET /jobs HTTP/1.1[0m" 500 -
+2026-04-28 22:37:22,974 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\db_connect.py', reloading
+2026-04-28 22:37:22,979 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\db_connect.py', reloading
+2026-04-28 22:37:23,180 - werkzeug - INFO -  * Restarting with stat
+2026-04-28 22:37:24,481 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:37:24,482 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:37:24,483 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:37:24,486 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:37:24,487 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:37:24,487 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:37:25,858 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:37:25,868 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:37:26,013 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:37:26,024 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:37:31,438 - __main__ - INFO - Health check passed - database connected
+2026-04-28 22:37:31,445 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:37:31] "GET /health HTTP/1.1" 200 -
+2026-04-28 22:37:47,934 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:37:47] "GET /jobs HTTP/1.1" 200 -
+2026-04-28 22:38:00,339 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:38:00] "GET /jobs/search?q=engineer HTTP/1.1" 200 -
+2026-04-28 22:38:03,512 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:38:03] "GET /system/stats HTTP/1.1" 200 -
+2026-04-28 22:38:08,174 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\db_connect.py', reloading
+2026-04-28 22:38:08,423 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\db_connect.py', reloading
+2026-04-28 22:38:10,158 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:38:10,159 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:38:10,160 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:38:11,875 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:38:11,882 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:38:36,042 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:38:36] "GET / HTTP/1.1" 200 -
+2026-04-28 22:38:36,736 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:38:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-04-28 22:38:46,431 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:38:46] "GET / HTTP/1.1" 200 -
+2026-04-28 22:40:06,156 - __main__ - INFO - Health check passed - database connected
+2026-04-28 22:40:06,274 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:40:06] "GET /health HTTP/1.1" 200 -
+2026-04-28 22:41:32,573 - __main__ - INFO - Health check passed - database connected
+2026-04-28 22:41:32,586 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:41:32] "GET /health HTTP/1.1" 200 -
+2026-04-28 22:43:03,804 - __main__ - INFO - Health check passed - database connected
+2026-04-28 22:43:03,814 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:03] "GET /health HTTP/1.1" 200 -
+2026-04-28 22:43:06,830 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:06] "GET /jobs HTTP/1.1" 200 -
+2026-04-28 22:43:10,729 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:10] "GET /system/stats HTTP/1.1" 200 -
+2026-04-28 22:43:14,568 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:14] "GET /jobs/search?q=engineer HTTP/1.1" 200 -
+2026-04-28 22:43:18,279 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:18] "GET /jobs/recommend/1 HTTP/1.1" 200 -
+2026-04-28 22:43:21,829 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:21] "GET /users/activity/1 HTTP/1.1" 200 -
+2026-04-28 22:43:25,327 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:25] "GET / HTTP/1.1" 200 -
+2026-04-28 22:43:32,106 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\integration_test.py', reloading
+2026-04-28 22:43:33,877 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:43:33,878 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:43:33,879 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:43:35,531 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:43:35,541 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:43:48,159 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:43:48] "HEAD / HTTP/1.1" 200 -
+2026-04-28 22:44:02,187 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:44:02] "GET / HTTP/1.1" 200 -
+2026-04-28 22:45:10,629 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 22:45:13,955 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:45:13,957 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:45:13,960 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:45:16,174 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:45:16,195 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:45:37,222 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 22:45:39,958 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:45:39,965 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:45:39,971 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:45:41,906 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:45:41,926 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:45:50,360 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 22:45:52,474 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:45:52,476 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:45:52,477 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:45:53,961 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:45:53,983 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:46:19,546 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:46:19,547 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:46:19,547 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:46:20,655 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-04-28 22:46:20,659 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-04-28 22:46:20,666 - werkzeug - INFO -  * Restarting with stat
+2026-04-28 22:46:21,628 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:46:21,628 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:46:21,629 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:46:22,469 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:46:22,480 - werkzeug - INFO -  * Debugger PIN: 291-375-747
+2026-04-28 22:46:35,531 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:46:35] "HEAD / HTTP/1.1" 200 -
+2026-04-28 22:46:49,801 - __main__ - INFO - Health check passed - database connected
+2026-04-28 22:46:49,891 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:46:49] "GET /health HTTP/1.1" 200 -
+2026-04-28 22:46:52,936 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:46:52] "GET /jobs HTTP/1.1" 200 -
+2026-04-28 22:46:56,050 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:46:56] "GET /system/stats HTTP/1.1" 200 -
+2026-04-28 22:47:00,051 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:47:00] "GET /jobs/search?q=engineer HTTP/1.1" 200 -
+2026-04-28 22:47:03,105 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:47:03] "GET /jobs/recommend/1 HTTP/1.1" 200 -
+2026-04-28 22:47:06,122 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:47:06] "GET /users/activity/1 HTTP/1.1" 200 -
+2026-04-28 22:47:09,277 - werkzeug - INFO - 127.0.0.1 - - [28/Apr/2026 22:47:09] "GET / HTTP/1.1" 200 -
+2026-04-28 22:49:29,717 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 22:49:29,789 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Ajay Dharrsan T R\\OneDrive\\Desktop\\DBMS-IATRS\\app.py', reloading
+2026-04-28 22:49:29,942 - werkzeug - INFO -  * Restarting with stat
+2026-04-28 22:50:48,432 - mysql.connector - INFO - package: mysql.connector.plugins
+2026-04-28 22:50:48,436 - mysql.connector - INFO - plugin_name: caching_sha2_password
+2026-04-28 22:50:48,439 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2026-04-28 22:50:52,081 - werkzeug - WARNING -  * Debugger is active!
+2026-04-28 22:50:52,115 - werkzeug - INFO -  * Debugger PIN: 291-375-747
